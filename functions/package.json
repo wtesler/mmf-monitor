@@ -1,0 +1,34 @@
+{
+  "name": "mmf-monitor",
+  "description": "Cloud Functions for which monitor MMF vault",
+  "scripts": {
+    "lint": "eslint ..",
+    "emulate": "firebase emulators:start --only ",
+    "serve": "firebase serve --only ",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only ",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "12"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/error-reporting": "2.0.4",
+    "cors": "2.8.5",
+    "cranny": "2.1.4",
+    "firebase-admin": "10.0.2",
+    "firebase-functions": "3.16.0",
+    "google-cloud-secrets": "1.3.2",
+    "google-cloud-report-error": "1.0.0",
+    "superagent": "7.1.2"
+  },
+  "devDependencies": {
+    "eslint": "7.21.0",
+    "eslint-config-google": "0.14.0",
+    "eslint-plugin-promise": "4.3.1",
+    "firebase-functions-test": "0.2.3"
+  },
+  "private": true
+}
