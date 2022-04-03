@@ -3,6 +3,12 @@
 Provides the ability to fetch the items
 in the MMF vault.
 
+## Setup Gcloud
+
+gcloud auth login --update-adc
+gcloud config set project mmf-monitor
+
+
 ### For developers
 
 Use `firebase serve --only functions` to run locally.

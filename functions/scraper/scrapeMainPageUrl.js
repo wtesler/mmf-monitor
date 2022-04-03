@@ -1,5 +1,5 @@
 module.exports = async () => {
-  const MMFClient = require('../MMF/MMFClient');
+  const MMFClient = require('../mmf/MMFClient');
 
   const indexHtml = await MMFClient.readAppIndex();
 

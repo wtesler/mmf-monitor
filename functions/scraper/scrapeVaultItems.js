@@ -1,5 +1,5 @@
 (async () => {
-  const MMFClient = require('../MMF/MMFClient');
+  const MMFClient = require('../mmf/MMFClient');
   const scrapeMainPageUrl = require('./scrapeMainPageUrl');
 
   const appUrl = await scrapeMainPageUrl();
