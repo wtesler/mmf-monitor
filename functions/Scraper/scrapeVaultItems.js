@@ -1,7 +1,9 @@
 (async () => {
   const MMFClient = require('../MMF/MMFClient');
+  const scrapeMainPageUrl = require('./scrapeMainPageUrl');
 
-  const page = await MMFClient.readAppPage();
+  const appUrl = await scrapeMainPageUrl();
+  const page = await MMFClient.readAppPage(appUrl);
 
   // Use this to locate where the items are in the text.
   const cueIndex = page.indexOf('pricePath');

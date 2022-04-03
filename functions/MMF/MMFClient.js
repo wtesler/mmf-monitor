@@ -3,9 +3,24 @@ class MMFClient {
     this.request = require("superagent");
   }
 
-  async readAppPage() {
+  async readAppIndex() {
     const req = this.request
-      .get('https://vaults.mm.finance/_next/static/chunks/pages/_app-3b8937dc8820b4f8ddd1.js')
+      .get('https://vaults.mm.finance/vault')
+      .use(this._defaultHeaders())
+      .use(this._toResilient());
+
+    try {
+      const networkResponse = await req;
+      const serverResponse = this._toSuccessResponse(networkResponse);
+      return serverResponse;
+    } catch (e) {
+      this._handleError(e, "Read App Index");
+    }
+  }
+
+  async readAppPage(url) {
+    const req = this.request
+      .get(url)
       .buffer(true)
       .use(this._defaultHeaders())
       .use(this._toResilient());
