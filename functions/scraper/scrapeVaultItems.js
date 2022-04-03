@@ -1,4 +1,4 @@
-(async () => {
+module.exports = async () => {
   const MMFClient = require('../mmf/MMFClient');
   const scrapeMainPageUrl = require('./scrapeMainPageUrl');
 
@@ -68,5 +68,7 @@
 
   items.push(curItem);
 
-  console.log(items);
-})();
+  // console.log(items);
+
+  return items;
+};
