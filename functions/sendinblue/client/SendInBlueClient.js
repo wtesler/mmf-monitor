@@ -54,6 +54,7 @@ class SendInBlueClient {
         return null;
       } else {
         this._handleError(e, this.CONTACTS);
+        return null;
       }
     }
   }
@@ -88,6 +89,7 @@ class SendInBlueClient {
         return null;
       } else {
         this._handleError(e, "Add Contact to List");
+        return null;
       }
     }
   }
@@ -137,6 +139,7 @@ class SendInBlueClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, this.EMAIL);
+      return null;
     }
   }
 
@@ -168,6 +171,7 @@ class SendInBlueClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, this.TRANSACTIONAL_SMS);
+      return null;
     }
   }
 
@@ -183,6 +187,7 @@ class SendInBlueClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, this.TEMPLATES);
+      return null;
     }
   }
 
@@ -201,7 +206,7 @@ class SendInBlueClient {
       const serverResponse = this._toSuccessResponse(networkResponse);
       return serverResponse;
     } catch (e) {
-      this._handleError(e, this.SENDERS);
+      return this._handleError(e, this.SENDERS);
     }
   }
 
@@ -217,6 +222,7 @@ class SendInBlueClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, this.SENDERS);
+      return null;
     }
   }
 
@@ -232,6 +238,7 @@ class SendInBlueClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, this.BLOCKED);
+      return null;
     }
   }
 
@@ -247,6 +254,7 @@ class SendInBlueClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, 'Get template info');
+      return null;
     }
   }
 

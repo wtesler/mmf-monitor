@@ -7,4 +7,4 @@ module.exports = async function (items) {
   const docRef = collection.doc('items');
 
   await docRef.set({items: items}, {merge: false});
-}
+};

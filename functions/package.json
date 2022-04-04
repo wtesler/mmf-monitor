@@ -1,13 +1,13 @@
 {
   "name": "mmf-monitor",
-  "description": "Cloud Functions for which monitor MMF vault",
+  "description": "Cloud Functions which monitor MMF vault",
   "scripts": {
     "lint": "eslint ..",
-    "emulate": "firebase emulators:start --only ",
-    "serve": "firebase serve --only ",
+    "emulate": "firebase emulators:start --only functions",
+    "serve": "firebase serve --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only ",
+    "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "engines": {
@@ -21,7 +21,6 @@
     "firebase-functions": "3.16.0",
     "google-cloud-secrets": "1.3.2",
     "google-cloud-report-error": "1.0.0",
-    "nanoid": "3.3.2",
     "superagent": "7.1.2"
   },
   "devDependencies": {

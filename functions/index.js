@@ -21,12 +21,7 @@
     const func = endpoint.obj;
     exports[funcName] = functions.region('us-central1').https.onRequest(async (req, res) => {
       cors(req, res, async () => {
-        try {
-          await func(req, res);
-        } catch (e) {
-          reportError(e, 'functions');
-          throw e;
-        }
+        await func(req, res);
       });
     });
   }

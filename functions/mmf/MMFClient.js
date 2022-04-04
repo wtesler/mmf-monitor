@@ -14,7 +14,7 @@ class MMFClient {
       const serverResponse = this._toSuccessResponse(networkResponse);
       return serverResponse;
     } catch (e) {
-      this._handleError(e, "Read App Index");
+      return this._handleError(e, "Read App Index");
     }
   }
 
@@ -30,7 +30,7 @@ class MMFClient {
       const serverResponse = this._toSuccessResponse(networkResponse);
       return serverResponse;
     } catch (e) {
-      this._handleError(e, "Read App Page");
+      return this._handleError(e, "Read App Page");
     }
   }
 
@@ -63,7 +63,7 @@ class MMFClient {
       request.set("accept", "application/javascript");
       request.set("content-type", "application/javascript");
       return request;
-    }.bind(this);
+    };
   }
 
   _toResilient() {

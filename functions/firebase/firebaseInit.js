@@ -1,5 +1,5 @@
 module.exports = async function () {
-  const { initializeApp, cert } = require('firebase-admin/app');
+  const {initializeApp, cert} = require('firebase-admin/app');
 
   const readFirebaseConfig = require("../secrets/specific/readFirebaseConfig");
   const service_account = await readFirebaseConfig();
@@ -13,17 +13,19 @@ module.exports = async function () {
   // The following back-ports support for firebase-admin 10 to the codebase.
   // Future projects should use the new firebase-admin 10 syntax directly.
 
-  const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+  const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 
   const firestore = getFirestore();
 
   const admin = {};
 
   // Services
-  admin.firestore = () => {return firestore};
+  admin.firestore = () => {
+    return firestore;
+  };
 
   // Properties
   admin.firestore.FieldValue = FieldValue;
 
   return admin;
-}
+};
