@@ -5,6 +5,6 @@ module.exports = async (itemName) => {
   const users = await readUsers();
 
   for (const user of users) {
-    await sendInBlueClient.sendEmail(user, 2, {tokenName: itemName}, null);
+    await sendInBlueClient.sendEmail(user, 3, {tokenName: itemName}, null);
   }
 };
