@@ -1,5 +1,5 @@
 (async () => {
-  const prepareBrowser = require("../prepareBrowser");
+  const prepareBrowser = require("../loginToMMF");
   try {
     await prepareBrowser();
     console.log('Success');
