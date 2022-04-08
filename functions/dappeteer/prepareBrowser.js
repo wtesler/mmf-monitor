@@ -10,8 +10,6 @@ module.exports = async () => {
     seed: phrase
   });
 
-  // await metamask.importPK('53da3148b367516be76783fd0cb66ce511e5201f59b3328c76eb734d6c989890')
-
   await metamask.addNetwork({
       networkName: 'Cronos',
       rpc: 'https://evm-cronos.crypto.org',
@@ -26,16 +24,12 @@ module.exports = async () => {
   const page = await browser.newPage();
   await page.goto('https://mm.finance');
 
-  // await metamask.page.bringToFront();
-  //
-  // const accountOptionsButton = await metamask.page.$('[title="Account Options"]');
-  //
-  // await accountOptionsButton.click();
-  //
-  // const connectedSitesButton = await metamask.page.$('[data-testid="account-options-menu__connected-sites"]');
-  //
-  // await connectedSitesButton.click();
+  await connectWallet(page, metamask);
 
+  // await metamask.switchAccount(0);
+};
+
+async function connectWallet(page, metamask) {
   const [connectWalletButton] = await page.$x("//button[contains(., 'Connect Wallet')]");
   if (connectWalletButton) {
     await connectWalletButton.click();
@@ -53,6 +47,4 @@ module.exports = async () => {
   await metamask.approve();
 
   await page.bringToFront();
-
-  // await metamask.switchAccount(0);
-};
+}
