@@ -10,6 +10,17 @@ module.exports = async () => {
     seed: phrase
   });
 
+  await setupCronosNetwork(metamask);
+
+  const page = await browser.newPage();
+  await page.goto('https://mm.finance');
+
+  await connectWallet(page, metamask);
+
+  
+};
+
+async function setupCronosNetwork(metamask) {
   await metamask.addNetwork({
       networkName: 'Cronos',
       rpc: 'https://evm-cronos.crypto.org',
@@ -20,14 +31,7 @@ module.exports = async () => {
   );
 
   await metamask.switchNetwork('Cronos');
-
-  const page = await browser.newPage();
-  await page.goto('https://mm.finance');
-
-  await connectWallet(page, metamask);
-
-  // await metamask.switchAccount(0);
-};
+}
 
 async function connectWallet(page, metamask) {
   const [connectWalletButton] = await page.$x("//button[contains(., 'Connect Wallet')]");
