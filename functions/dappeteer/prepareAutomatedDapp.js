@@ -5,9 +5,15 @@ module.exports = async () => {
 
   const browser = await prepareBrowser();
 
+  console.log("Prepared browser");
+
   const metamask = await prepareMetamask(browser);
 
+  console.log("Prepared Metamask");
+
   await prepareCronosNetwork(metamask);
+
+  console.log("Prepared Cronos Network");
 
   return [browser, metamask];
 }

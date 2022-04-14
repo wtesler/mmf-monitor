@@ -4,6 +4,7 @@ module.exports = async () => {
 
   const options = {
     metamaskVersion: 'v10.8.1',
+    headless: false,
     devtools: false,
     dumpio: false,
     args: [
