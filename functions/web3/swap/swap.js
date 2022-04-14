@@ -1,4 +1,4 @@
-module.exports = async (amountIn, amountOut, internalTransactions, wallet) => {
+module.exports = async (formattedIn, formattedOut, internalTransactions, wallet) => {
   const {ethers} = require("ethers");
 
   const mmfMasterContractAddress = '0x145677fc4d9b8f19b5d56d1820c48e0443049a30';
@@ -7,12 +7,12 @@ module.exports = async (amountIn, amountOut, internalTransactions, wallet) => {
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
   const tx = await contract.swapExactETHForTokens(
-    amountOut,
+    formattedOut,
     internalTransactions,
     wallet.address,
     Date.now() + 1000 * 60 * 1, // 1 minute
     {
-      value: amountIn
+      value: formattedIn
     }
   );
 
