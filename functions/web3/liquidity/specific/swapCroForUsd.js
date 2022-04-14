@@ -1,9 +1,9 @@
 module.exports = async (amountIn, amountOut, wallet) => {
   const FormatToken = require("../../../constants/FormatToken");
-  const swap = require("../swap");
+  const swap = require("../addLiquidity");
 
-  const formattedIn = FormatToken.formatToken('CRO', amountIn);
-  const formattedOut = FormatToken.formatToken('USDC', amountOut);
+  const formattedIn = FormatToken.formatCro(amountIn);
+  const formattedOut = FormatToken.formatUsdc(amountOut);
 
   const internalTransactions = [
     '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23',

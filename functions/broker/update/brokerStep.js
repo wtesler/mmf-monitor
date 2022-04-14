@@ -1,13 +1,15 @@
+const swapPools = require("../transact/swapPools");
 module.exports = async () => {
   const readBrokerConfig = require('../read/readBrokerConfig');
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
   const updateBrokerHistory = require('../update/updateBrokerHistory');
   const smma = require('../analysis/smma');
+  const swapPools = require('../transact/swapPools');
 
   const config = await readBrokerConfig();
   const bullConfig = config.bull;
-  // const bearConfig = config.bear;
+  const bearConfig = config.bear;
 
   const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, bullConfig.address);
 
@@ -34,8 +36,10 @@ module.exports = async () => {
   const slowIndicator = smma(historyPoints, slowIndicatorPeriod);
 
   if (fastIndicator < slowIndicator) {
+    await swapPools(bullConfig.name, bearConfig.name);
     // SELL
   } else if (fastIndicator > slowIndicator) {
     // BUY
+    await swapPools(bearConfig.name, bullConfig.name);
   }
 };

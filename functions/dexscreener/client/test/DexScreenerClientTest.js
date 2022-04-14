@@ -3,7 +3,7 @@
   const PairAddresses = require('../../../constants/PairAddresses');
   const NetworkNames = require('../../../constants/NetworkNames');
 
-  const response = await dexScreenerClient.readPairInfo(NetworkNames.CRONOS, PairAddresses.MMF_WCRO);
+  const response = await dexScreenerClient.readPairInfo(NetworkNames.CRONOS, PairAddresses.MMF_CRO);
 
   console.log(response);
 })();
