@@ -1,9 +1,9 @@
 (async () => {
   const dexScreenerClient = require('../DexScreenerClient');
-  const PairAddresses = require('../../../constants/PairAddresses');
+  const TokenAddresses = require('../../../constants/TokenAddresses');
   const NetworkNames = require('../../../constants/NetworkNames');
 
-  const response = await dexScreenerClient.readPairInfo(NetworkNames.CRONOS, PairAddresses.MMF_CRO);
+  const response = await dexScreenerClient.readPairInfo(NetworkNames.CRONOS, TokenAddresses.MMF_USDC);
 
   console.log(response);
 })();

@@ -1,4 +1,3 @@
-const swapPools = require("../transact/swapPools");
 module.exports = async () => {
   const readBrokerConfig = require('../read/readBrokerConfig');
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
@@ -6,6 +5,8 @@ module.exports = async () => {
   const updateBrokerHistory = require('../update/updateBrokerHistory');
   const smma = require('../analysis/smma');
   const swapPools = require('../transact/swapPools');
+
+  const ACTION = `BROKER STEP`;
 
   const config = await readBrokerConfig();
   const bullConfig = config.bull;
@@ -28,7 +29,7 @@ module.exports = async () => {
   }
 
   if (slowIndicatorPeriod > numHistoryPoints) {
-    console.warn('waiting for more points before doing anything else.');
+    console.warn(`${ACTION} | waiting for more points before doing anything else.`);
     return;
   }
 
@@ -36,10 +37,10 @@ module.exports = async () => {
   const slowIndicator = smma(historyPoints, slowIndicatorPeriod);
 
   if (fastIndicator < slowIndicator) {
+    console.log(`${ACTION} | SELLING`);
     await swapPools(bullConfig.name, bearConfig.name);
-    // SELL
   } else if (fastIndicator > slowIndicator) {
-    // BUY
+    console.log(`${ACTION} | BUYING`);
     await swapPools(bearConfig.name, bullConfig.name);
   }
 };

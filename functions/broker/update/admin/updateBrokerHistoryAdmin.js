@@ -1,9 +1,9 @@
 (async () => {
   const updateBrokerHistory = require("../updateBrokerHistory");
-  const PairNames = require("../../../constants/PairNames");
+  const TokenNames = require("../../../constants/TokenNames");
 
   try {
-    const history = await updateBrokerHistory(PairNames.MMF_CRO, 8);
+    const history = await updateBrokerHistory(TokenNames.MMF_USDC, 8);
     console.log(history);
   } catch (e) {
     console.error(e);

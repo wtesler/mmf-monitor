@@ -14,4 +14,16 @@ module.exports = class TokenAddresses {
   static get MMF() {
     return '0x97749c9b61f878a880dfe312d2594ae07aed7656';
   }
+
+  static get MMF_CRO() {
+    return '0xbA452A1c0875D33a440259B1ea4DcA8f5d86D9Ae';
+  }
+
+  static get MMF_USDC() {
+    return '0x722f19bd9a1e5ba97b3020c6028c279d27e4293c';
+  }
+
+  static get USDC_USDT() {
+    return '0x6f186e4bed830d13dce638e40ba27fd6d91bad0b';
+  }
 };

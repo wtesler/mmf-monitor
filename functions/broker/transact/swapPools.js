@@ -1,8 +1,10 @@
 module.exports = async (srcPool, dstPool) => {
+  const prepareWallet = require('../../web3/wallet/prepareWallet');
   const readBrokerConfig = require('../read/readBrokerConfig');
-  const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
-  const NetworkNames = require('../../constants/NetworkNames');
-  const addLiquidity = require('../../web3/liquidity/addLiquidity');
+  const addMaxLiquidity = require('../../web3/liquidity/addMaxLiquidity');
+  const stakeMaxLiquidity = require('../../web3/liquidity/stakeMaxLiquidity');
+
+  const wallet = await prepareWallet();
 
   const config = await readBrokerConfig();
   const bullConfig = config.bull;
@@ -16,20 +18,30 @@ module.exports = async (srcPool, dstPool) => {
     throw new Error('src and dst pools must be a part of the current broker config.');
   }
 
+  const ACTION = `SWAP POOLS`;
+
+  console.log(`${ACTION} | ${srcPool} -> ${dstPool}`);
+
   const srcTokens = srcPool.split('_');
   const dstTokens = dstPool.split('_');
 
-  // Harvest Rewards and Unstake
+  const srcA = srcTokens[0];
+  const srcB = srcTokens[1];
+
+  const dstA = dstTokens[0];
+  const dstB = dstTokens[1];
+
+  // Unstake
 
   // Breakup LP tokens
 
-
-
-  // Exchange broken-up tokens with new tokens
+  // Swap src tokens with dst tokens
 
   // Create LP tokens
 
-  await addLiquidity(dstTokens[0], dstTokens[1], CONTINUED);
+  await addMaxLiquidity(dstA, dstB, wallet);
 
   // Stake new LP tokens.
+
+  await stakeMaxLiquidity(dstPool, wallet);
 };

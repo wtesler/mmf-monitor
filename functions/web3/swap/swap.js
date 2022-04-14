@@ -1,3 +1,4 @@
+const resilientTransact = require("../../web3/transact/resilientTransact");
 module.exports = async (formattedIn, formattedOut, internalTransactions, wallet) => {
   const {ethers} = require("ethers");
 
@@ -6,21 +7,15 @@ module.exports = async (formattedIn, formattedOut, internalTransactions, wallet)
 
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
-  const tx = await contract.swapExactETHForTokens(
-    formattedOut,
-    internalTransactions,
-    wallet.address,
-    Date.now() + 1000 * 60 * 1, // 1 minute
-    {
-      value: formattedIn
-    }
-  );
-
-  const awaitedTx = await tx.wait();
-
-  console.log(awaitedTx);
-
-  if (awaitedTx.code === 'CALL_EXCEPTION') {
-    throw new Error("Transaction failed!");
-  }
+  await resilientTransact(async () => {
+    return contract.swapExactETHForTokens(
+      formattedOut,
+      internalTransactions,
+      wallet.address,
+      Date.now() + 1000 * 60 * 1, // 1 minute
+      {
+        value: formattedIn
+      }
+    );
+  });
 };
