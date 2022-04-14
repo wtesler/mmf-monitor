@@ -1,20 +1,12 @@
 module.exports = async () => {
-  const {ethers} = require("ethers");
+  const prepareWallet = require('./wallet/prepareWallet');
 
-  const provider = new ethers.providers.JsonRpcProvider('https://evm.cronos.org', {
-    name: 'CRO',
-    chainId: 25
-  });
-
-  const readDefiMnemonic = require('../secrets/specific/readDefiMnemonic');
-  const mnemonic = await readDefiMnemonic();
-
-  const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
+  const wallet = await prepareWallet();
 
   // const balance = await getCroBalance(provider, wallet.address);
   // console.log(balance);
 
-  const swapCroForUsd = require('./swap/swapCroForUsd');
+  const swapCroForUsd = require('./swap/swap');
 
   await swapCroForUsd(wallet);
 

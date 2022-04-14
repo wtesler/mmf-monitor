@@ -1,4 +1,4 @@
-module.exports = async (wallet) => {
+module.exports = async (amountIn, amountOut, internalTransactions, wallet) => {
   const {ethers} = require("ethers");
 
   const mmfMasterContractAddress = '0x145677fc4d9b8f19b5d56d1820c48e0443049a30';
@@ -7,11 +7,13 @@ module.exports = async (wallet) => {
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
   const tx = await contract.swapExactETHForTokens(
-    ethers.utils.parseUnits("8.439031", 6), // USDC
-    ['0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23', '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59'],
+    amountOut,
+    internalTransactions,
     wallet.address,
     Date.now() + 1000 * 60 * 1, // 1 minute
-    { value: ethers.utils.parseUnits("20", 18) } // CRO
+    {
+      value: amountIn
+    }
   );
 
   const awaitedTx = await tx.wait();

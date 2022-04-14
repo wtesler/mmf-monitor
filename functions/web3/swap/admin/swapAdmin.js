@@ -1,7 +1,7 @@
 (async () => {
-  const swapCroForUsd = require("../swapCroForUsd");
+  const swap = require("../swap");
   try {
-    await swapCroForUsd();
+    // await swap(); // Needs parameters
     console.log('Success');
   } catch (e) {
     console.error(e);
