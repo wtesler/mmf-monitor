@@ -56,7 +56,7 @@ class DexScreenerClient {
       request.set("accept", "application/json");
       request.set("content-type", "application/json");
       return request;
-    }.bind(this);
+    };
   }
 
   _toResilient() {

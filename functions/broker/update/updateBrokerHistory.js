@@ -16,7 +16,7 @@ module.exports = async (asset, newValue) => {
 
   const newPoints = {
     points: historyPoints
-  }
+  };
 
   const firestore = admin.firestore();
   const docRef = firestore.doc(`brokerHistory/${asset}`);
