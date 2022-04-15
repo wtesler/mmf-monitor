@@ -3,6 +3,7 @@ module.exports = async (srcPool, dstPool) => {
   const readBrokerConfig = require('../read/readBrokerConfig');
   const addMaxLiquidity = require('../../web3/liquidity/addMaxLiquidity');
   const stakeMaxLiquidity = require('../../web3/liquidity/stakeMaxLiquidity');
+  const unstakeMaxLiquidity = require('../../web3/liquidity/unstakeMaxLiquidity');
 
   const wallet = await prepareWallet();
 
@@ -32,16 +33,17 @@ module.exports = async (srcPool, dstPool) => {
   const dstB = dstTokens[1];
 
   // Unstake
+  await unstakeMaxLiquidity(srcPool, wallet);
 
   // Breakup LP tokens
 
-  // Swap src tokens with dst tokens
+  // Even out broken-up tokens.
+
+  // Swap src tokens with dst tokens.
 
   // Create LP tokens
-
   await addMaxLiquidity(dstA, dstB, wallet);
 
   // Stake new LP tokens.
-
   await stakeMaxLiquidity(dstPool, wallet);
 };

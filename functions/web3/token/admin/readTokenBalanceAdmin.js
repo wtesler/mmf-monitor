@@ -6,7 +6,7 @@
   try {
     const wallet = await prepareWallet();
 
-    const balance = await readTokenBalance(TokenNames.USDC_USDT, wallet);
+    const balance = await readTokenBalance(TokenNames.USDC, wallet);
 
     console.log(balance);
   } catch (e) {

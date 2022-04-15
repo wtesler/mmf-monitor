@@ -24,7 +24,11 @@ async function readErc20Balance(tokenName, wallet) {
   const tokenAddress = TokenAddresses[tokenName];
 
   const contract = new ethers.Contract(tokenAddress, genericAbi, wallet);
-  const balance = await contract.balanceOf(wallet.address);
+
+  // TODO Determined why calling it twice is needed to ensure it is up-to-date.
+  // noinspection JSUnusedAssignment
+  let balance = await contract.balanceOf(wallet.address);
+  balance = await contract.balanceOf(wallet.address);
 
   return balance;
 }
