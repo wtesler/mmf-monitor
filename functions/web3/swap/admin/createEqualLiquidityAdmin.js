@@ -1,5 +1,5 @@
 (async () => {
-  const createEqualLiquidity = require("../createEqualLiquidity");
+  const createEqualLiquidity = require("../liquidity/createEqualLiquidity");
   const prepareWallet = require("../../wallet/prepareWallet");
   const TokenAddresses = require("../../../constants/TokenAddresses");
 

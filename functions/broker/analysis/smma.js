@@ -1,5 +1,6 @@
 /**
  * Computes the Smoothed Moving Average of points in a list.
+ *
  * @param list A list of numbers.
  * @param n The period of the SMMA. Will used latest points.
  */

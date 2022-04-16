@@ -27,7 +27,7 @@ module.exports = async (tokenPairName, wallet) => {
 
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
-  const deadline = Date.now() + 1000 * 60 * 1; // 1 minute
+  const deadline = Date.now() + 1000 * 60 * 2; // 2 minutes
 
   const lpAddress = LpAddresses[tokenPairName];
 

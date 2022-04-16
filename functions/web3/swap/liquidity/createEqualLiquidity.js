@@ -1,11 +1,11 @@
 module.exports = async (pairAddress, wallet) => {
-  const readTokenBalance = require('../token/readTokenBalance');
-  const swapTokens = require('./swapTokens');
-  const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
-  const NetworkNames = require("../../constants/NetworkNames");
-  const TokenAddresses = require("../../constants/TokenAddresses");
-  const TokenDecimals = require("../../constants/TokenDecimals");
-  const FormatToken = require("../../constants/FormatToken");
+  const readTokenBalance = require('../../token/readTokenBalance');
+  const swapTokens = require('../swapTokens');
+  const DexScreenerClient = require('../../../dexscreener/client/DexScreenerClient');
+  const NetworkNames = require("../../../constants/NetworkNames");
+  const TokenAddresses = require("../../../constants/TokenAddresses");
+  const TokenDecimals = require("../../../constants/TokenDecimals");
+  const FormatToken = require("../../../constants/FormatToken");
 
   const ACTION = `CREATING EQUAL LIQUIDITY`;
 

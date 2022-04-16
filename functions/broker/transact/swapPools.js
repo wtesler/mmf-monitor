@@ -1,11 +1,16 @@
+/**
+ * Swap from one staked LP pool to another.
+ *
+ * @param srcConfig token `name` and token `address`.
+ * @param dstConfig token `name` and token `address`.
+ */
 module.exports = async (srcConfig, dstConfig) => {
   const prepareWallet = require('../../web3/wallet/prepareWallet');
-  const readBrokerConfig = require('../read/readBrokerConfig');
   const addMaxLiquidity = require('../../web3/liquidity/addMaxLiquidity');
   const stakeMaxLiquidity = require('../../web3/liquidity/stakeMaxLiquidity');
   const unstakeMaxLiquidity = require('../../web3/liquidity/unstakeMaxLiquidity');
   const removeMaxLiquidity = require('../../web3/liquidity/removeMaxLiquidity');
-  const createEqualLiquidity = require('../../web3/swap/createEqualLiquidity');
+  const createEqualLiquidity = require('../../web3/swap/liquidity/createEqualLiquidity');
 
   const ACTION = `SWAP POOLS`;
 

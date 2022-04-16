@@ -13,7 +13,7 @@ module.exports = async (formattedIn, formattedOutMin, internalTransactions, wall
       formattedOutMin,
       internalTransactions,
       wallet.address,
-      Date.now() + 1000 * 60 * 1, // 1 minute
+      Date.now() + 1000 * 60 * 2, // 2 minutes
     );
   });
 };

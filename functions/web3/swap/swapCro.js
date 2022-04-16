@@ -12,7 +12,7 @@ module.exports = async (formattedIn, formattedOut, internalTransactions, wallet)
       formattedOut,
       internalTransactions,
       wallet.address,
-      Date.now() + 1000 * 60 * 1, // 1 minute
+      Date.now() + 1000 * 60 * 2, // 2 minutes
       {
         value: formattedIn
       }
