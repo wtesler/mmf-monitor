@@ -1,5 +1,5 @@
 (async () => {
-  const swap = require("../swap");
+  const swap = require("../swapCro");
   try {
     // await swap(); // Needs parameters
     console.log('Success');

@@ -1,25 +1,21 @@
-module.exports = async (srcPool, dstPool) => {
+module.exports = async (srcConfig, dstConfig) => {
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const readBrokerConfig = require('../read/readBrokerConfig');
   const addMaxLiquidity = require('../../web3/liquidity/addMaxLiquidity');
   const stakeMaxLiquidity = require('../../web3/liquidity/stakeMaxLiquidity');
   const unstakeMaxLiquidity = require('../../web3/liquidity/unstakeMaxLiquidity');
+  const removeMaxLiquidity = require('../../web3/liquidity/removeMaxLiquidity');
+  const createEqualLiquidity = require('../../web3/swap/createEqualLiquidity');
+
+  const ACTION = `SWAP POOLS`;
 
   const wallet = await prepareWallet();
 
-  const config = await readBrokerConfig();
-  const bullConfig = config.bull;
-  const bearConfig = config.bear;
+  const srcPool = srcConfig.name;
+  const srcAddress = srcConfig.address;
 
-  const isPoolInConfig = (pool) => {
-    return bullConfig.name === pool || bearConfig.name === pool;
-  }
-
-  if (!isPoolInConfig(srcPool) || !isPoolInConfig(dstPool)) {
-    throw new Error('src and dst pools must be a part of the current broker config.');
-  }
-
-  const ACTION = `SWAP POOLS`;
+  const dstPool = dstConfig.name;
+  const dstAddress = dstConfig.address;
 
   console.log(`${ACTION} | ${srcPool} -> ${dstPool}`);
 
@@ -36,8 +32,10 @@ module.exports = async (srcPool, dstPool) => {
   await unstakeMaxLiquidity(srcPool, wallet);
 
   // Breakup LP tokens
+  await removeMaxLiquidity(srcPool, wallet);
 
   // Even out broken-up tokens.
+  await createEqualLiquidity(srcAddress, wallet);
 
   // Swap src tokens with dst tokens.
 

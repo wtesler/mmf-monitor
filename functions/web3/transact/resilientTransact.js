@@ -15,7 +15,7 @@ module.exports = async (transactionAction) => {
 
       const awaitedTx = await tx.wait();
 
-      console.log(awaitedTx);
+      // console.log(awaitedTx);
 
       if (awaitedTx.code === 'CALL_EXCEPTION') {
         // noinspection ExceptionCaughtLocallyJS
@@ -36,4 +36,4 @@ module.exports = async (transactionAction) => {
   }
 
   throw error;
-}
+};

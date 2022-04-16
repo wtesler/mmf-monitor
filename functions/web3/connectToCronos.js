@@ -6,7 +6,7 @@ module.exports = async () => {
   // const balance = await getCroBalance(provider, wallet.address);
   // console.log(balance);
 
-  const swapCroForUsd = require('./swap/swap');
+  const swapCroForUsd = require('./swap/swapCro');
 
   await swapCroForUsd(wallet);
 

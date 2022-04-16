@@ -53,4 +53,4 @@ module.exports = async function (
   const split = utils.splitSignature(rawSignature);
 
   return [split.v, split.r, split.s];
-}
+};

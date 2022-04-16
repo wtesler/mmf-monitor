@@ -1,8 +1,9 @@
+const updateBrokerHistorySeries = require("./updateBrokerHistorySeries");
 module.exports = async () => {
   const readBrokerConfig = require('../read/readBrokerConfig');
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
-  const updateBrokerHistory = require('../update/updateBrokerHistory');
+  const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
   const smma = require('../analysis/smma');
   const swapPools = require('../transact/swapPools');
 
@@ -16,10 +17,10 @@ module.exports = async () => {
 
   const bullPriceUsd = Number(pairInfo.pair.priceUsd);
 
-  const brokerHistory = await updateBrokerHistory(bullConfig.name, bullPriceUsd);
+  const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'points', bullPriceUsd);
 
   const historyPoints = brokerHistory.points;
-  const numHistoryPoints = brokerHistory.points.length;
+  const numHistoryPoints = historyPoints.length;
 
   const fastIndicatorPeriod = bullConfig.indicator.period.fast;
   const slowIndicatorPeriod = bullConfig.indicator.period.slow;
@@ -29,6 +30,7 @@ module.exports = async () => {
   }
 
   if (slowIndicatorPeriod > numHistoryPoints) {
+    await updateBrokerHistorySeries(bullConfig.name, 'status', 'NONE');
     console.warn(`${ACTION} | waiting for more points before doing anything else.`);
     return;
   }
@@ -38,9 +40,11 @@ module.exports = async () => {
 
   if (fastIndicator < slowIndicator) {
     console.log(`${ACTION} | SELLING`);
-    await swapPools(bullConfig.name, bearConfig.name);
+    await updateBrokerHistorySeries(bullConfig.name, 'status', 'SELL');
+    // await swapPools(bullConfig, bearConfig);
   } else if (fastIndicator > slowIndicator) {
     console.log(`${ACTION} | BUYING`);
-    await swapPools(bearConfig.name, bullConfig.name);
+    await updateBrokerHistorySeries(bullConfig.name, 'status', 'BUY');
+    // await swapPools(bearConfig, bullConfig);
   }
 };
