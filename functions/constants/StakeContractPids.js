@@ -4,6 +4,6 @@ module.exports = class StakeContractPids {
   }
 
   static get MMF_USDC() {
-    return 'TBD';
+    return 7;
   }
 };

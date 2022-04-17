@@ -36,14 +36,10 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
 
     let srcAmount = await readTokenBalance(src, wallet);
 
-    console.log(srcAmount);
-
     // TODO Why do we have to decrement a tiny value?
-    srcAmount = srcAmount - (Math.pow(10, -TokenDecimals[src]));
+    srcAmount = srcAmount - (Math.pow(10, -6));
 
     srcAmount = Number(srcAmount.toFixed(TokenDecimals[src])); // Round off the decimal.
-
-    console.log(srcAmount);
 
     // TODO This could be more strict.
     const dstAmountMin = 0;
@@ -63,6 +59,9 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
   };
 
   const swapProperDst = async (src) => {
+    if (isFinished(src)) {
+      return;
+    }
     if (!isFinished(dstA)) {
       await performSwap(src, dstA);
     } else if (!isFinished(dstB)) {
@@ -72,4 +71,6 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
 
   await swapProperDst(srcA);
   await swapProperDst(srcB);
+
+  console.log(`${ACTION} | SUCCESS`);
 };

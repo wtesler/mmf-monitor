@@ -6,8 +6,8 @@
   const wallet = await prepareWallet();
 
   await swapPairs(
-    TokenNames.USDC, TokenNames.USDT,
     TokenNames.MMF, TokenNames.USDC,
+    TokenNames.USDC, TokenNames.USDT,
     wallet
   );
 

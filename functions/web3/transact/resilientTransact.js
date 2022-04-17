@@ -4,7 +4,7 @@
  * @param transactionAction An function which returns a pending transaction.
  */
 module.exports = async (transactionAction) => {
-  const TOTAL_ATTEMPTS = 5;
+  const TOTAL_ATTEMPTS = 4;
 
   let numAttempts = 0;
   let error;
@@ -19,7 +19,7 @@ module.exports = async (transactionAction) => {
 
       if (awaitedTx.code === 'CALL_EXCEPTION') {
         // noinspection ExceptionCaughtLocallyJS
-        throw awaitedTx; // It is intended that this is caught locally.
+        throw new Error(awaitedTx.reason); // It is intended that this is caught locally.
       }
 
       return awaitedTx;

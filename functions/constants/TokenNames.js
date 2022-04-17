@@ -19,10 +19,6 @@ module.exports = class TokenNames {
     return 'MMF';
   }
 
-  static get MMF_CRO() {
-    return 'MMF_CRO';
-  }
-
   static get MMF_USDC() {
     return 'MMF_USDC';
   }

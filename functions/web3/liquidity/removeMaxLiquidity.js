@@ -1,13 +1,20 @@
+const TokenAddresses = require("../../constants/TokenAddresses");
 module.exports = async (tokenPairName, wallet) => {
   const {ethers} = require("ethers");
   const resilientTransact = require("../../web3/transact/resilientTransact");
   const TokenAddresses = require("../../constants/TokenAddresses");
   const readTokenBalance = require("../token/readTokenBalance");
   const FormatToken = require("../../constants/FormatToken");
-  const LpAddresses = require("../../constants/LpAddresses");
   const signMeerkatLpMessage = require('./helper/signMeerkatLpMessage');
+  const meerkatPairAbi = require('../token/abis/meerkat_pair_abi.json');
+
+  const ACTION = `REMOVING MAX LIQUIDITY`;
+
+  console.log(`${ACTION} | ${tokenPairName}`);
 
   const tokenPairBalance = await readTokenBalance(tokenPairName, wallet);
+
+  console.log(`${ACTION} | WE HAVE ${tokenPairBalance} ${tokenPairName}`);
 
   const tokenPairFormattedBalance = FormatToken.formatToken(tokenPairName, tokenPairBalance);
 
@@ -27,9 +34,12 @@ module.exports = async (tokenPairName, wallet) => {
 
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
-  const deadline = Date.now() + 1000 * 60 * 2; // 2 minutes
+  const lpAddress = TokenAddresses[tokenPairName];
 
-  const lpAddress = LpAddresses[tokenPairName];
+  const meerkatPairContract = new ethers.Contract(lpAddress, meerkatPairAbi, wallet);
+  const nonce = await meerkatPairContract.nonces(wallet.address);
+
+  const deadline = Date.now() + 1000 * 60 * 2; // 2 minutes
 
   const [v, r, s] = await signMeerkatLpMessage(
     wallet,
@@ -37,8 +47,11 @@ module.exports = async (tokenPairName, wallet) => {
     contract,
     mmfMasterContractAddress,
     tokenPairFormattedBalance,
-    deadline
+    deadline,
+    nonce.toHexString()
   );
+
+  console.log(`${ACTION} | SIGNED MESSAGE`);
 
   await resilientTransact(async () => {
     return contract.removeLiquidityWithPermit(
@@ -55,4 +68,6 @@ module.exports = async (tokenPairName, wallet) => {
       s
     );
   });
+
+  console.log(`${ACTION} | SUCCESS`);
 };

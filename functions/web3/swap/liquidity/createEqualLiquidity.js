@@ -63,4 +63,6 @@ module.exports = async (pairAddress, wallet) => {
   ];
 
   await swapTokens(formattedInAmount, formattedOutAmountMin, internalTransactions, wallet);
+
+  console.log(`${ACTION} | SUCCESS`);
 };

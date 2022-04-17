@@ -1,11 +1,10 @@
-const updateBrokerHistorySeries = require("./updateBrokerHistorySeries");
 module.exports = async () => {
   const readBrokerConfig = require('../read/readBrokerConfig');
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
   const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
   const smma = require('../analysis/smma');
-  const swapPools = require('../transact/swapPools');
+  const swapStakedPools = require('../../web3/swap/stake/swapStakedPools');
 
   const ACTION = `BROKER STEP`;
 
@@ -41,10 +40,10 @@ module.exports = async () => {
   if (fastIndicator < slowIndicator) {
     console.log(`${ACTION} | SELLING`);
     await updateBrokerHistorySeries(bullConfig.name, 'status', 'SELL');
-    // await swapPools(bullConfig, bearConfig);
+    await swapStakedPools(bullConfig.name, bearConfig.name);
   } else if (fastIndicator > slowIndicator) {
     console.log(`${ACTION} | BUYING`);
     await updateBrokerHistorySeries(bullConfig.name, 'status', 'BUY');
-    // await swapPools(bearConfig, bullConfig);
+    await swapStakedPools(bearConfig.name, bullConfig.name);
   }
 };

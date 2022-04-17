@@ -4,11 +4,10 @@ module.exports = async function (
   contract,
   spender,
   value,
-  deadline
+  deadline,
+  nonce,
 ) {
   const {utils} = require("ethers");
-
-  const nonce = '0x01';
 
   const rawSignature = await signer._signTypedData(
     {
