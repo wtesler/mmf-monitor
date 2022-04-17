@@ -11,7 +11,7 @@ module.exports = async (tokenPairName, wallet) => {
 
   const tokenPairFormattedBalance = FormatToken.formatToken(tokenPairName, tokenPairBalance);
 
-  // This could be more strict.
+  // TODO This could be more strict.
   const tokenAMinAmount = '0x0';
   const tokenBMinAmount = '0x0';
 

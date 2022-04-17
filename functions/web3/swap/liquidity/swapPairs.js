@@ -1,66 +1,75 @@
-module.exports = async (srcTokens, dstTokens, wallet) => {
+module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
   const readTokenBalance = require('../../token/readTokenBalance');
   const swapTokens = require('../swapTokens');
-  const DexScreenerClient = require('../../../dexscreener/client/DexScreenerClient');
-  const NetworkNames = require("../../../constants/NetworkNames");
   const TokenAddresses = require("../../../constants/TokenAddresses");
   const TokenDecimals = require("../../../constants/TokenDecimals");
   const FormatToken = require("../../../constants/FormatToken");
 
-  const ACTION = `CREATING EQUAL LIQUIDITY`;
+  const ACTION = `SWAPPING PAIRS`;
 
-  const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, pairAddress);
-  const quoteToken = pairInfo.pair.quoteToken.symbol;
-  const baseToken = pairInfo.pair.baseToken.symbol;
-  const priceRatio = 1 / Number(pairInfo.pair.priceNative);
+  console.log(`${ACTION} | TOKENS: ${srcA}_${srcB} -> ${dstA}_${dstB}`);
 
-  console.log(`${ACTION} | TOKENS: ${quoteToken} / ${baseToken}`);
+  const finishedDsts = [];
 
-  console.log(`${ACTION} | PRICE RATIO: ${priceRatio}`);
+  // Check if the dst pair shares a token with the src pair. For example, USDC in USDC/USDT -> MMF/USDC.
+  const checkForFinishedSwaps = src => {
+    if (src === dstA) {
+      console.log(`${ACTION} | ${src} ALREADY IN DST`);
+      finishedDsts.push(dstA);
+    }
+    if (src === dstB) {
+      console.log(`${ACTION} | ${src} ALREADY IN DST`);
+      finishedDsts.push(dstB);
+    }
+  };
 
-  const quoteAmount = await readTokenBalance(quoteToken, wallet);
-  const baseAmount = await readTokenBalance(baseToken, wallet);
+  checkForFinishedSwaps(srcA);
+  checkForFinishedSwaps(srcB);
 
-  console.log(`${ACTION} | WE HAVE ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
+  const isFinished = token => {
+    return finishedDsts.includes(token);
+  };
 
-  const basedQuoteAmount = quoteAmount * priceRatio;
+  const performSwap = async(src, dst) => {
+    const srcAddress = TokenAddresses[src];
+    const dstAddress = TokenAddresses[dst];
 
-  const tokenRatio = baseAmount ? basedQuoteAmount / baseAmount : 9999999999;
+    let srcAmount = await readTokenBalance(src, wallet);
 
-  if (tokenRatio > 0.995 && tokenRatio < 1.005) {
-    console.log(`${ACTION} | TOKEN RATIO CLOSE ENOUGH. NO SWAPS.`);
-    return;
-  }
+    console.log(srcAmount);
 
-  const getInOrOutValues = (shouldGetQuoteValues) => {
-    const basedDifference = basedQuoteAmount - baseAmount;
-    const basedMiddleDifference = basedDifference / 2;
+    // TODO Why do we have to decrement a tiny value?
+    srcAmount = srcAmount - (Math.pow(10, -TokenDecimals[src]));
 
-    const token = shouldGetQuoteValues ? quoteToken : baseToken;
-    const debaseMult = shouldGetQuoteValues ? (1 / priceRatio) : 1;
+    srcAmount = Number(srcAmount.toFixed(TokenDecimals[src])); // Round off the decimal.
 
-    let swapAmount = Math.abs(basedMiddleDifference * debaseMult);
-    swapAmount = Number(swapAmount.toFixed(TokenDecimals[token])); // Round off the decimal.
+    console.log(srcAmount);
 
-    const address = TokenAddresses[shouldGetQuoteValues ? quoteToken : baseToken];
+    // TODO This could be more strict.
+    const dstAmountMin = 0;
 
-    return [token, swapAmount, address];
-  }
+    console.log(`${ACTION} | ${srcAmount} ${src} for atleast ${dstAmountMin} ${dst}.`);
 
-  const [inToken, inSwapAmount, inAddress] = getInOrOutValues(tokenRatio > 1);
-  const [outToken, outSwapAmount, outAddress] = getInOrOutValues(tokenRatio <= 1);
+    const formattedInAmount = FormatToken.formatToken(src, srcAmount);
+    const formattedOutAmountMin = FormatToken.formatToken(dst, dstAmountMin);
 
-  let outAmountMin = outSwapAmount * .99; // Slippage
-  outAmountMin = Number(outAmountMin.toFixed(TokenDecimals[outToken])); // Round off the decimal.
+    const internalTransactions = [
+      srcAddress, dstAddress
+    ];
 
-  console.log(`${ACTION} | SWAPPING ${inSwapAmount} ${inToken} for atleast ${outAmountMin} ${outToken}.`);
+    await swapTokens(formattedInAmount, formattedOutAmountMin, internalTransactions, wallet);
 
-  const formattedInAmount = FormatToken.formatToken(inToken, inSwapAmount);
-  const formattedOutAmountMin = FormatToken.formatToken(outToken, outAmountMin);
+    finishedDsts.push(dst);
+  };
 
-  const internalTransactions = [
-    inAddress, outAddress
-  ];
+  const swapProperDst = async (src) => {
+    if (!isFinished(dstA)) {
+      await performSwap(src, dstA);
+    } else if (!isFinished(dstB)) {
+      await performSwap(src, dstB);
+    }
+  };
 
-  await swapTokens(formattedInAmount, formattedOutAmountMin, internalTransactions, wallet);
+  await swapProperDst(srcA);
+  await swapProperDst(srcB);
 };

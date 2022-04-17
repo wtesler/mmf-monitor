@@ -11,6 +11,7 @@ module.exports = async (srcConfig, dstConfig) => {
   const unstakeMaxLiquidity = require('../../web3/liquidity/unstakeMaxLiquidity');
   const removeMaxLiquidity = require('../../web3/liquidity/removeMaxLiquidity');
   const createEqualLiquidity = require('../../web3/swap/liquidity/createEqualLiquidity');
+  const swapPairs = require('../../web3/swap/liquidity/swapPairs');
 
   const ACTION = `SWAP POOLS`;
 
@@ -43,8 +44,9 @@ module.exports = async (srcConfig, dstConfig) => {
   await createEqualLiquidity(srcAddress, wallet);
 
   // Swap src tokens with dst tokens.
+  await swapPairs(srcA, srcB, dstA, dstB, wallet);
 
-  // Create LP tokens
+  // Create LP tokens.
   await addMaxLiquidity(dstA, dstB, wallet);
 
   // Stake new LP tokens.

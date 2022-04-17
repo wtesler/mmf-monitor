@@ -16,7 +16,7 @@ module.exports = class TokenDecimals {
   }
 
   static get MMF() {
-    return 18; // QUESTIONABLE!
+    return 18;
   }
 
   static get MMF_CRO() {
