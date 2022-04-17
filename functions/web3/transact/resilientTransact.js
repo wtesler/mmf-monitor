@@ -14,7 +14,7 @@ module.exports = async (transactionAction) => {
       const tx = await transactionAction();
 
       if (tx === null) {
-        return null; // Transaction Action was a NOOP.
+        return false; // Transaction Action was a NOOP.
       }
 
       const awaitedTx = await tx.wait();
