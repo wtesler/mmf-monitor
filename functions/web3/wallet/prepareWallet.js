@@ -1,4 +1,3 @@
-const {ethers} = require("ethers");
 module.exports = async () => {
   const {ethers} = require("ethers");
 

@@ -55,7 +55,7 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
       ];
 
       return [formattedInAmount, formattedOutAmountMin, internalTransactions];
-    }
+    };
 
     await swapTokens(parameterFunction, wallet);
 

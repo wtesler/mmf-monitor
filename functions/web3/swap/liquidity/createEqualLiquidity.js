@@ -46,7 +46,7 @@ module.exports = async (pairAddress, wallet) => {
       const address = TokenAddresses[shouldGetQuoteValues ? quoteToken : baseToken];
 
       return [token, swapAmount, address];
-    }
+    };
 
     const [inToken, inSwapAmount, inAddress] = getInOrOutValues(tokenRatio > 1);
     const [outToken, outSwapAmount, outAddress] = getInOrOutValues(tokenRatio <= 1);
@@ -64,7 +64,7 @@ module.exports = async (pairAddress, wallet) => {
     ];
 
     return [formattedInAmount, formattedOutAmountMin, internalTransactions];
-  }
+  };
 
   await swapTokens(parameterFunction, wallet);
 
