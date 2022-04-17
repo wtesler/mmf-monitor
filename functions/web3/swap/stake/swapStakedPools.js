@@ -1,8 +1,3 @@
-const removeMaxLiquidity = require("../../liquidity/removeMaxLiquidity");
-const createEqualLiquidity = require("../liquidity/createEqualLiquidity");
-const swapPairs = require("../liquidity/swapPairs");
-const addMaxLiquidity = require("../../liquidity/addMaxLiquidity");
-const stakeMaxLiquidity = require("../../liquidity/stakeMaxLiquidity");
 /**
  * Swap from one staked LP pool to another.
  *
