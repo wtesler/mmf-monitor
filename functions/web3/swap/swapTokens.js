@@ -1,4 +1,4 @@
-module.exports = async (formattedIn, formattedOutMin, internalTransactions, wallet) => {
+module.exports = async (parameterFunction, wallet) => {
   const {ethers} = require("ethers");
   const resilientTransact = require("../../web3/transact/resilientTransact");
 
@@ -8,6 +8,13 @@ module.exports = async (formattedIn, formattedOutMin, internalTransactions, wall
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
   await resilientTransact(async () => {
+    const [formattedIn, formattedOutMin, internalTransactions] = await parameterFunction();
+
+    if (formattedIn === null || formattedOutMin === null || internalTransactions === null) {
+      console.log('SWAP TOKENS | NOT SWAPPING');
+      return null; // Early exit.
+    }
+
     return contract.swapExactTokensForTokens(
       formattedIn,
       formattedOutMin,

@@ -6,7 +6,7 @@
   const wallet = await prepareWallet();
 
   await createEqualLiquidity(
-    TokenAddresses.MMF_USDC,
+    TokenAddresses.USDC_USDT,
     wallet,
   );
 

@@ -5,5 +5,5 @@
 
   const wallet = await prepareWallet();
 
-  await stakeMaxLiquidity(TokenNames.USDC_USDT, wallet);
+  await stakeMaxLiquidity(TokenNames.MMF_USDC, wallet);
 })();

@@ -31,29 +31,33 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
   };
 
   const performSwap = async(src, dst) => {
-    const srcAddress = TokenAddresses[src];
-    const dstAddress = TokenAddresses[dst];
+    const parameterFunction = async() => {
+      const srcAddress = TokenAddresses[src];
+      const dstAddress = TokenAddresses[dst];
 
-    let srcAmount = await readTokenBalance(src, wallet);
+      let srcAmount = await readTokenBalance(src, wallet);
 
-    // TODO Why do we have to decrement a tiny value?
-    srcAmount = srcAmount - (Math.pow(10, -6));
+      // TODO Why do we have to decrement a tiny value?
+      srcAmount = srcAmount - (Math.pow(10, -6));
 
-    srcAmount = Number(srcAmount.toFixed(TokenDecimals[src])); // Round off the decimal.
+      srcAmount = Number(srcAmount.toFixed(TokenDecimals[src])); // Round off the decimal.
 
-    // TODO This could be more strict.
-    const dstAmountMin = 0;
+      // TODO This could be more strict.
+      const dstAmountMin = 0;
 
-    console.log(`${ACTION} | ${srcAmount} ${src} for atleast ${dstAmountMin} ${dst}.`);
+      console.log(`${ACTION} | ${srcAmount} ${src} for atleast ${dstAmountMin} ${dst}.`);
 
-    const formattedInAmount = FormatToken.formatToken(src, srcAmount);
-    const formattedOutAmountMin = FormatToken.formatToken(dst, dstAmountMin);
+      const formattedInAmount = FormatToken.formatToken(src, srcAmount);
+      const formattedOutAmountMin = FormatToken.formatToken(dst, dstAmountMin);
 
-    const internalTransactions = [
-      srcAddress, dstAddress
-    ];
+      const internalTransactions = [
+        srcAddress, dstAddress
+      ];
 
-    await swapTokens(formattedInAmount, formattedOutAmountMin, internalTransactions, wallet);
+      return [formattedInAmount, formattedOutAmountMin, internalTransactions];
+    }
+
+    await swapTokens(parameterFunction, wallet);
 
     finishedDsts.push(dst);
   };

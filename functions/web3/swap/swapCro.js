@@ -1,3 +1,6 @@
+/**
+ * @deprecated Not in use and might be antiquated.
+ */
 module.exports = async (formattedIn, formattedOut, internalTransactions, wallet) => {
   const {ethers} = require("ethers");
   const resilientTransact = require("../../web3/transact/resilientTransact");

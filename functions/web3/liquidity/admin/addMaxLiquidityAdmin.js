@@ -6,5 +6,5 @@
 
   const wallet = await prepareWallet();
 
-  await addMaxLiquidity(TokenNames.USDC, TokenNames.USDT, TokenAddresses.USDC_USDT, wallet);
+  await addMaxLiquidity(TokenNames.MMF, TokenNames.USDC, TokenAddresses.MMF_USDC, wallet);
 })();
