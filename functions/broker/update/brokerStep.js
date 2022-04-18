@@ -4,7 +4,7 @@ module.exports = async () => {
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
   const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
-  const smma = require('../analysis/smma');
+  const macd = require('macd');
 
   const ACTION = `BROKER STEP`;
 
@@ -23,6 +23,8 @@ module.exports = async () => {
 
   const fastIndicatorPeriod = bullConfig.indicator.period.fast;
   const slowIndicatorPeriod = bullConfig.indicator.period.slow;
+  const signalIndicatorPeriod = bullConfig.indicator.period.signal;
+  const signalThreshold = bullConfig.indicator.threshold;
 
   if (fastIndicatorPeriod > slowIndicatorPeriod) {
     throw new Error("Fast indicator period is larger than slow indicator period which is a violation of logic.");
@@ -34,12 +36,19 @@ module.exports = async () => {
     return;
   }
 
-  const fastIndicator = smma(historyPoints, fastIndicatorPeriod);
-  const slowIndicator = smma(historyPoints, slowIndicatorPeriod);
+  const macdResults = macd(historyPoints, slowIndicatorPeriod, fastIndicatorPeriod, signalIndicatorPeriod);
+  const histogram = macdResults.histogram;
+  const latestIndicator = histogram[histogram.length - 1];
 
-  const shouldSell = fastIndicator < slowIndicator;
+  const shouldSell = latestIndicator < -signalThreshold;
+  const shouldBuy = latestIndicator > signalThreshold;
 
-  const action = shouldSell ? 'SELL' : 'BUY';
+  let action = 'NONE';
+  if (shouldSell) {
+    action = 'SELL';
+  } else if (shouldBuy) {
+    action = 'BUY';
+  }
 
   console.log(`${ACTION} | ${action}`);
 
@@ -48,9 +57,11 @@ module.exports = async () => {
   const srcPool = shouldSell ? bullConfig.name : bearConfig.name;
   const dstPool = shouldSell ? bearConfig.name : bullConfig.name;
 
-  // Purposefully do not await this. It will start function calls in the background.
-  // noinspection ES6MissingAwait
-  triggerSwaps(srcPool, dstPool);
+  if (shouldSell || shouldBuy) {
+    // Purposefully do not await this. It will start cloud function calls in the background.
+    // noinspection ES6MissingAwait
+    triggerSwaps(srcPool, dstPool);
+  }
 
   console.log(`${ACTION} | SUCCESS`);
 };
