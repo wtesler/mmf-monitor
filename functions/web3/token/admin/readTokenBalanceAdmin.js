@@ -2,14 +2,13 @@
   const readTokenBalance = require("../readTokenBalance");
   const prepareWallet = require("../../wallet/prepareWallet");
   const TokenNames = require("../../../constants/TokenNames");
+  const readDefiMnemonic = require('../../../secrets/specific/readDefiMnemonic');
 
-  try {
-    const wallet = await prepareWallet();
+  const mnemonic = await readDefiMnemonic();
 
-    const balance = await readTokenBalance(TokenNames.USDC, wallet);
+  const wallet = await prepareWallet(mnemonic);
 
-    console.log(balance);
-  } catch (e) {
-    console.error(e);
-  }
+  const balance = await readTokenBalance(TokenNames.USDC, wallet);
+
+  console.log(balance);
 })();

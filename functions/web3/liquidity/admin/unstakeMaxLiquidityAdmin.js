@@ -2,8 +2,11 @@
   const unstakeMaxLiquidity = require("../unstakeMaxLiquidity");
   const prepareWallet = require("../../wallet/prepareWallet");
   const TokenNames = require("../../../constants/TokenNames");
+  const readDefiMnemonic = require('../../../secrets/specific/readDefiMnemonic');
 
-  const wallet = await prepareWallet();
+  const mnemonic = await readDefiMnemonic();
+
+  const wallet = await prepareWallet(mnemonic);
 
   await unstakeMaxLiquidity(TokenNames.USDC_USDT, wallet);
 })();

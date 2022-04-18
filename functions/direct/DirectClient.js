@@ -22,12 +22,13 @@ class DirectClient {
   /**
    * Adds a new contact
    */
-  async swapStakedPools(srcPool, dstPool) {
+  async swapStakedPools(srcPool, dstPool, mnemonic) {
     const req = this.request
       .post(this.HOST + this.SWAP_STAKED_POOLS)
       .send({
         srcPool: srcPool,
-        dstPool: dstPool
+        dstPool: dstPool,
+        mnemonic: mnemonic,
       })
       .use(this._defaultHeaders())
       .use(this._toResilient());

@@ -4,6 +4,9 @@ module.exports = async () => {
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
   const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
+  const readStakedBalance = require('../../web3/token/readStakedBalance');
+  const readWallets = require('../../wallets/read/readWallets');
+  const prepareWallet = require('../../web3/wallet/prepareWallet');
   const macd = require('macd');
 
   const ACTION = `BROKER STEP`;
@@ -50,18 +53,32 @@ module.exports = async () => {
     action = 'BUY';
   }
 
-  console.log(`${ACTION} | ${action}`);
-
   await updateBrokerHistorySeries(bullConfig.name, 'status', action);
 
   const srcPool = shouldSell ? bullConfig.name : bearConfig.name;
   const dstPool = shouldSell ? bearConfig.name : bullConfig.name;
 
-  if (shouldSell || shouldBuy) {
-    // Purposefully do not await this. It will start cloud function calls in the background.
-    // noinspection ES6MissingAwait
-    triggerSwaps(srcPool, dstPool);
+  if (!shouldSell && !shouldBuy) {
+    return;
   }
 
-  console.log(`${ACTION} | SUCCESS`);
+  console.log(`${ACTION} | ${action}`);
+
+  const wallets = await readWallets();
+
+  for (const walletData of wallets) {
+    const {mnemonic, email} = walletData;
+
+    const wallet = await prepareWallet(mnemonic);
+
+    const pairTokenBalance = await readStakedBalance(srcPool, wallet);
+
+    if (pairTokenBalance === 0) {
+      continue;
+    }
+
+    // Purposefully do not await this. It will start cloud function calls in the background.
+    // noinspection ES6MissingAwait
+    triggerSwaps(srcPool, dstPool, mnemonic);
+  }
 };

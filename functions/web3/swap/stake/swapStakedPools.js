@@ -3,8 +3,9 @@
  *
  * @param srcPool token pair name.
  * @param dstPool token pair name.
+ * @param mnemonic The mnemonic of the wallet.
  */
-module.exports = async (srcPool, dstPool) => {
+module.exports = async (srcPool, dstPool, mnemonic) => {
   const prepareWallet = require('../../wallet/prepareWallet');
   const addMaxLiquidity = require('../../liquidity/addMaxLiquidity');
   const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
@@ -16,7 +17,7 @@ module.exports = async (srcPool, dstPool) => {
 
   const ACTION = `SWAP POOLS`;
 
-  const wallet = await prepareWallet();
+  const wallet = await prepareWallet(mnemonic);
 
   const srcAddress = TokenAddresses[srcPool];
   const dstAddress = TokenAddresses[dstPool];
