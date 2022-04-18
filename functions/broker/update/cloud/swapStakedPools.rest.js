@@ -9,10 +9,11 @@ module.exports = [
     const srcPool = req.body.srcPool;
     const dstPool = req.body.dstPool;
     const mnemonic = req.body.mnemonic;
-    if (!srcPool || !dstPool || !mnemonic) {
+    const email = req.body.email;
+    if (!srcPool || !dstPool || !mnemonic || !email) {
       parameterError(req);
     }
 
-    return await swapStakedPools(srcPool, dstPool, mnemonic);
+    return await swapStakedPools(srcPool, dstPool, mnemonic, email);
   }, 'direct')
 ];

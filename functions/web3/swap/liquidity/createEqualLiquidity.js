@@ -17,7 +17,6 @@ module.exports = async (pairAddress, wallet) => {
     const priceNative = pair.liquidity.quote / pair.liquidity.base;
     const priceRatio = 1 / priceNative;
 
-
     console.log(`${ACTION} | TOKENS: ${quoteToken} / ${baseToken}`);
 
     console.log(`${ACTION} | PRICE RATIO: ${priceRatio}`);

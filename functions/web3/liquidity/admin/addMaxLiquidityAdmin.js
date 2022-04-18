@@ -9,5 +9,7 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  await addMaxLiquidity(TokenNames.MMF, TokenNames.USDC, TokenAddresses.MMF_USDC, wallet);
+  const poolSizeUsd = await addMaxLiquidity(TokenNames.MMF, TokenNames.USDC, TokenAddresses.MMF_USDC, wallet);
+
+  console.log(poolSizeUsd);
 })();

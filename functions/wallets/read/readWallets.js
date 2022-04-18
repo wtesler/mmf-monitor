@@ -10,6 +10,7 @@ module.exports = async function () {
   const wallets = [];
   for (const doc of walletsSnapshot.docs) {
     const data = doc.data();
+    data.id = doc.id;
     wallets.push(data);
   }
 

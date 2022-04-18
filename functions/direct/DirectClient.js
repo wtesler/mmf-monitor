@@ -19,16 +19,14 @@ class DirectClient {
     this.HOST = "http://localhost:5000/mmf-monitor/us-central1/";
   }
 
-  /**
-   * Adds a new contact
-   */
-  async swapStakedPools(srcPool, dstPool, mnemonic) {
+  async swapStakedPools(srcPool, dstPool, mnemonic, email) {
     const req = this.request
       .post(this.HOST + this.SWAP_STAKED_POOLS)
       .send({
         srcPool: srcPool,
         dstPool: dstPool,
         mnemonic: mnemonic,
+        email: email,
       })
       .use(this._defaultHeaders())
       .use(this._toResilient());
@@ -82,11 +80,6 @@ class DirectClient {
 
   _toResilient() {
     return function (request) {
-      request.timeout({
-        response: 15000,
-        deadline: 60000,
-      });
-      request.retry(3);
       return request;
     };
   }

@@ -28,9 +28,6 @@ class SendInBlueClient {
     return SendInBlueClient.DEFAULT_EMAIL.email;
   }
 
-  /**
-   * Adds a new contact
-   */
   async addContact(email) {
     const req = this.request
       .post(this.HOST + this.CONTACTS)

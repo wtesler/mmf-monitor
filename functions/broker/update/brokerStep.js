@@ -43,6 +43,8 @@ module.exports = async () => {
   const histogram = macdResults.histogram;
   const latestIndicator = histogram[histogram.length - 1];
 
+  await updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
+
   const shouldSell = latestIndicator < -signalThreshold;
   const shouldBuy = latestIndicator > signalThreshold;
 
@@ -67,7 +69,7 @@ module.exports = async () => {
   const wallets = await readWallets();
 
   for (const walletData of wallets) {
-    const {mnemonic, email} = walletData;
+    const {mnemonic} = walletData;
 
     const wallet = await prepareWallet(mnemonic);
 
@@ -79,6 +81,6 @@ module.exports = async () => {
 
     // Purposefully do not await this. It will start cloud function calls in the background.
     // noinspection ES6MissingAwait
-    triggerSwaps(srcPool, dstPool, mnemonic);
+    triggerSwaps(action, srcPool, dstPool, walletData);
   }
 };

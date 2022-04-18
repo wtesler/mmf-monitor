@@ -4,7 +4,7 @@
  * @param transactionAction An function which returns a pending transaction.
  */
 module.exports = async (transactionAction) => {
-  const TOTAL_ATTEMPTS = 5;
+  const TOTAL_ATTEMPTS = 6;
 
   let numAttempts = 0;
   let error;
@@ -34,14 +34,18 @@ module.exports = async (transactionAction) => {
         console.warn(`TRANSACTION FAILED. TRYING AGAIN AFTER PAUSE.`);
         if (e.code === 'CALL_EXCEPTION') {
           console.warn(e.reason);
+        } if (e.code === 'SERVER_ERROR') {
+          console.warn(e.reason);
+          console.warn(e.body);
         } else {
           console.warn(e);
         }
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 10000));
         console.warn(`TRYING AGAIN.`);
       }
     }
   }
 
+  // Something failed if we got to the end here.
   throw error;
 };

@@ -9,7 +9,7 @@
   const wallet = await prepareWallet(mnemonic);
 
   await createEqualLiquidity(
-    TokenAddresses.USDC_USDT,
+    TokenAddresses.MMF_USDC,
     wallet,
   );
 

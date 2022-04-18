@@ -12,6 +12,8 @@ module.exports = async (tokenName, wallet) => {
 
   const userInfo = await contract.userInfo(pid, wallet.address);
 
+  // console.log(userInfo);
+
   const balance = userInfo.amount;
 
   // const rewardDebt = userInfo.rewardDebt;

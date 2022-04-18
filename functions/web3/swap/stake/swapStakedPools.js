@@ -4,8 +4,10 @@
  * @param srcPool token pair name.
  * @param dstPool token pair name.
  * @param mnemonic The mnemonic of the wallet.
+ * @param email The of the wallet.
  */
-module.exports = async (srcPool, dstPool, mnemonic) => {
+module.exports = async (srcPool, dstPool, mnemonic, email) => {
+  const sendInBlueClient = await require('../../../sendinblue/client/SendInBlueClient');
   const prepareWallet = require('../../wallet/prepareWallet');
   const addMaxLiquidity = require('../../liquidity/addMaxLiquidity');
   const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
@@ -51,6 +53,11 @@ module.exports = async (srcPool, dstPool, mnemonic) => {
 
     // Stake new LP tokens.
     await stakeMaxLiquidity(dstPool, wallet);
+
+    await sendInBlueClient.sendEmail(email, 5, {
+      srcPool: srcPool,
+      dstPool: dstPool
+    });
   }
 
   console.log(`${ACTION} | SUCCESS`);

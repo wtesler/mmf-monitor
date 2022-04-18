@@ -11,11 +11,14 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
 
   console.log(`${ACTION} | ${tokenA}_${tokenB}`);
 
+  let poolSizeUsd;
+
   await resilientTransact(async () => {
     const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, pairAddress);
     const pair = pairInfo.pair;
     const quoteToken = pair.quoteToken.symbol;
     const baseToken = pair.baseToken.symbol;
+    poolSizeUsd = pair.liquidity.usd;
     const priceNative = pair.liquidity.quote / pair.liquidity.base;
     const priceRatio = 1 / priceNative;
 
@@ -71,4 +74,6 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
   });
 
   console.log(`${ACTION} | SUCCESS`);
+
+  return poolSizeUsd;
 };

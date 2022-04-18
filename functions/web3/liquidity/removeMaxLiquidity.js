@@ -51,7 +51,7 @@ module.exports = async (tokenPairName, wallet) => {
       nonce.toHexString()
     );
 
-    console.log(`${ACTION} | SIGNED MESSAGE`);
+    // console.log(`${ACTION} | SIGNED MESSAGE`);
 
     return contract.removeLiquidityWithPermit(
       addressTokenA,

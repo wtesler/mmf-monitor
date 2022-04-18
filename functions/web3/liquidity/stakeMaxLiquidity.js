@@ -3,6 +3,7 @@ module.exports = async (pairTokenName, wallet) => {
   const FormatToken = require("../../constants/FormatToken");
   const StakeContractPids = require("../../constants/StakeContractPids");
   const readTokenBalance = require("../../web3/token/readTokenBalance");
+  const readStakedBalance = require("../../web3/token/readStakedBalance");
   const resilientTransact = require("../../web3/transact/resilientTransact");
 
   const ACTION = `STAKING`;
@@ -21,8 +22,12 @@ module.exports = async (pairTokenName, wallet) => {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, wallet);
 
-    return contract.deposit(contractPid, pairTokenFormmattedBalance, '0x0000000000000000000000000000000000000000');
+    return await contract.deposit(contractPid, pairTokenFormmattedBalance, '0x0000000000000000000000000000000000000000');
   });
 
+  const stakedBalance = await readStakedBalance(pairTokenName, wallet);
+
   console.log(`${ACTION} | SUCCESS`);
+
+  return stakedBalance;
 };
