@@ -15,6 +15,10 @@ class DirectClient {
     this.SWAP_STAKED_POOLS = "swapStakedPools";
   }
 
+  setToTest() {
+    this.HOST = "http://localhost:5000/mmf-monitor/us-central1/";
+  }
+
   /**
    * Adds a new contact
    */
@@ -23,7 +27,7 @@ class DirectClient {
       .post(this.HOST + this.SWAP_STAKED_POOLS)
       .send({
         srcPool: srcPool,
-        dstPool: dstPool,
+        dstPool: dstPool
       })
       .use(this._defaultHeaders())
       .use(this._toResilient());
@@ -64,9 +68,13 @@ class DirectClient {
 
   _defaultHeaders() {
     return function (request) {
-      request.send("_secret", this.directKey);
-      request.set("accept", "application/json");
-      request.set("content-type", "application/json");
+      request
+        .send({
+          _secret: this.directKey
+        })
+        .set("accept", "application/json")
+        .set("content-type", "application/json");
+
       return request;
     }.bind(this);
   }
