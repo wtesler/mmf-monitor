@@ -13,8 +13,8 @@ module.exports = async () => {
   const bearConfig = config.bear;
 
   const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, bullConfig.address);
-
-  const bullPriceUsd = Number(pairInfo.pair.priceUsd);
+  const pair = pairInfo.pair;
+  const bullPriceUsd = pair.liquidity.quote / pair.liquidity.base;
 
   const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'points', bullPriceUsd);
 

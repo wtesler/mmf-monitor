@@ -11,9 +11,12 @@ module.exports = async (pairAddress, wallet) => {
 
   const parameterFunction = async() => {
     const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, pairAddress);
-    const quoteToken = pairInfo.pair.quoteToken.symbol;
-    const baseToken = pairInfo.pair.baseToken.symbol;
-    const priceRatio = 1 / Number(pairInfo.pair.priceNative);
+    const pair = pairInfo.pair;
+    const quoteToken = pair.quoteToken.symbol;
+    const baseToken = pair.baseToken.symbol;
+    const priceNative = pair.liquidity.quote / pair.liquidity.base;
+    const priceRatio = 1 / priceNative;
+
 
     console.log(`${ACTION} | TOKENS: ${quoteToken} / ${baseToken}`);
 
