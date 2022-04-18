@@ -1,13 +1,11 @@
-# MMF Monitor
+# Algorithmic Trading with Staked Liquidity Pools
 
-Provides the ability to fetch the items
-in the MMF vault.
+An algorithmic trader which swaps between staked Defi liquidity pools.
 
 ## Setup Gcloud
 
 gcloud auth login --update-adc
 gcloud config set project mmf-monitor
-
 
 ### For developers
 
