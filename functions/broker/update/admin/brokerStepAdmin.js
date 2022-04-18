@@ -3,10 +3,5 @@
  */
 (async () => {
   const brokerStep = require("../brokerStep");
-  try {
-    await brokerStep();
-    console.log('Success');
-  } catch (e) {
-    console.error(e);
-  }
+  await brokerStep();
 })();
