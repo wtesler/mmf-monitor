@@ -56,35 +56,36 @@ module.exports = async () => {
     action = 'BUY';
   }
 
+  console.log(`${ACTION} | ${action}`);
+
   // noinspection ES6MissingAwait
   updateBrokerHistorySeries(bullConfig.name, 'status', action);
+
+  if (action === 'NONE') {
+    return;
+  }
+
+  const lastAction = brokerHistory.status[brokerHistory.status.length - 1];
+
+  if (lastAction === action) {
+    return;
+  }
 
   const srcPool = shouldSell ? bullConfig.name : bearConfig.name;
   const dstPool = shouldSell ? bearConfig.name : bullConfig.name;
 
-  console.log(`${ACTION} | ${action}`);
-
-  if (!shouldSell && !shouldBuy) {
-    return;
-  }
-
   const walletDatas = await readWallets();
 
-  const walletPromises = walletDatas.map(({mnemonic}) => prepareWallet(mnemonic));
+  // const walletPromises = walletDatas.map(({mnemonic}) => prepareWallet(mnemonic));
+  //
+  // const wallets = await Promise.all(walletPromises);
 
-  const wallets = await Promise.all(walletPromises);
-
-  const balancePromises = wallets.map(wallet => readStakedBalance(srcPool, wallet));
-
-  const balances = await Promise.all(balancePromises);
+  // const balancePromises = wallets.map(wallet => readStakedBalance(srcPool, wallet));
+  //
+  // const balances = await Promise.all(balancePromises);
 
   for (let i = 0; i < walletDatas.length; i++) {
     const walletData = walletDatas[i];
-    const balance = balances[i];
-
-    if (balance === 0) {
-      continue;
-    }
 
     // Purposefully do not await this. It will start cloud function calls in the background.
     // noinspection ES6MissingAwait

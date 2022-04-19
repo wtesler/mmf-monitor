@@ -19,7 +19,7 @@ class DirectClient {
     this.HOST = "http://localhost:5000/mmf-monitor/us-central1/";
   }
 
-  async swapStakedPools(srcPool, dstPool, mnemonic, email) {
+  async swapStakedPools(srcPool, dstPool, mnemonic, email, signal) {
     const req = this.request
       .post(this.HOST + this.SWAP_STAKED_POOLS)
       .send({
@@ -27,6 +27,7 @@ class DirectClient {
         dstPool: dstPool,
         mnemonic: mnemonic,
         email: email,
+        signal: signal,
       })
       .use(this._defaultHeaders())
       .use(this._toResilient());

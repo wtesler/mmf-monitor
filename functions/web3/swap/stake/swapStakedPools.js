@@ -5,8 +5,9 @@
  * @param dstPool token pair name.
  * @param mnemonic The mnemonic of the wallet.
  * @param email The of the wallet.
+ * @param signal 'BUY' or 'SELL' signal.
  */
-module.exports = async (srcPool, dstPool, mnemonic, email) => {
+module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
   const sendInBlueClient = await require('../../../sendinblue/client/SendInBlueClient');
   const prepareWallet = require('../../wallet/prepareWallet');
   const addMaxLiquidity = require('../../liquidity/addMaxLiquidity');
@@ -35,33 +36,41 @@ module.exports = async (srcPool, dstPool, mnemonic, email) => {
   const dstA = dstTokens[0];
   const dstB = dstTokens[1];
 
+  const isSellSignal = signal === 'SELL';
+
   // Unstake
-  const didStakeExist = await unstakeMaxLiquidity(srcPool, wallet);
+  let didStakeExist = true;
+  if (isSellSignal) {
+    didStakeExist = await unstakeMaxLiquidity(srcPool, wallet);
+  }
 
   if (didStakeExist) {
     // Breakup LP tokens
-    await removeMaxLiquidity(srcPool, wallet);
-
-    // TODO Is this really needed?
-    await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
+    if (isSellSignal) {
+      await removeMaxLiquidity(srcPool, wallet);
+      // TODO Is this really needed?
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
+    }
 
     // Swap src tokens with dst tokens.
     await swapPairs(srcA, srcB, dstA, dstB, wallet);
 
-    // TODO Is this really needed?
-    await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
+    if (!isSellSignal) {
+      // TODO Is this really needed?
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
 
-    // Even out tokens.
-    await createEvenLiquidity(dstAddress, wallet);
+      // Even out tokens.
+      await createEvenLiquidity(dstAddress, wallet);
 
-    // TODO Is this really needed?
-    await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
+      // TODO Is this really needed?
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
 
-    // Create LP tokens.
-    await addMaxLiquidity(dstA, dstB, dstAddress, wallet);
+      // Create LP tokens.
+      await addMaxLiquidity(dstA, dstB, dstAddress, wallet);
 
-    // Stake new LP tokens.
-    await stakeMaxLiquidity(dstPool, wallet);
+      // Stake new LP tokens.
+      await stakeMaxLiquidity(dstPool, wallet);
+    }
 
     // Send Swap Confirmation Email.
     await sendInBlueClient.sendEmail(email, 5, {

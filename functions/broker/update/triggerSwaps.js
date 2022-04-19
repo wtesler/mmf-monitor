@@ -3,25 +3,18 @@ module.exports = async (signal, srcPool, dstPool, walletData) => {
   const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
   const {reportError} = require("google-cloud-report-error");
 
-  const {mnemonic, email} = walletData;
-
-  let signalMessage = signal;
-  if (signal === 'SELL') {
-    signalMessage = 'BEAR';
-  } else if (signal === 'BUY') {
-    signalMessage = 'BULL';
-  }
-
   try {
+    const {mnemonic, email} = walletData;
+
     // No need to await the sending of the email.
     // noinspection ES6MissingAwait
     sendInBlueClient.sendEmail(email, 4, {
-      signal: signalMessage,
+      signal: signal,
       srcPool: srcPool,
       dstPool: dstPool
     });
 
-    await directClient.swapStakedPools(srcPool, dstPool, mnemonic, email);
+    await directClient.swapStakedPools(srcPool, dstPool, mnemonic, email, signal);
   } catch (e) {
     // Attempting a call to the cloud functions has failed in the background.
     reportError(e);
