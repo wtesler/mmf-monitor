@@ -65,16 +65,21 @@ module.exports = async () => {
     return;
   }
 
-  const wallets = await readWallets();
+  const walletDatas = await readWallets();
 
-  for (const walletData of wallets) {
-    const {mnemonic} = walletData;
+  const walletPromises = walletDatas.map(({mnemonic}) => prepareWallet(mnemonic));
 
-    const wallet = await prepareWallet(mnemonic);
+  const wallets = await Promise.all([walletPromises]);
 
-    const pairTokenBalance = await readStakedBalance(srcPool, wallet);
+  const balancePromises = wallets.map(wallet => readStakedBalance(srcPool, wallet));
 
-    if (pairTokenBalance === 0) {
+  const balances = await Promise.all(balancePromises);
+
+  for (let i = 0; i < walletDatas.length; i++) {
+    const walletData = walletDatas[i];
+    const balance = balances[i];
+
+    if (balance === 0) {
       continue;
     }
 
