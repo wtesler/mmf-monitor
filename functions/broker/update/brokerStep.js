@@ -29,12 +29,9 @@ module.exports = async () => {
   const signalIndicatorPeriod = bullConfig.indicator.period.signal;
   const signalThreshold = bullConfig.indicator.threshold;
 
-  if (fastIndicatorPeriod > slowIndicatorPeriod) {
-    throw new Error("Fast indicator period is larger than slow indicator period which is a violation of logic.");
-  }
-
   if (slowIndicatorPeriod > numHistoryPoints) {
-    await updateBrokerHistorySeries(bullConfig.name, 'status', 'NONE');
+    // noinspection ES6MissingAwait
+    updateBrokerHistorySeries(bullConfig.name, 'status', 'NONE');
     console.warn(`${ACTION} | waiting for more points before doing anything else.`);
     return;
   }
@@ -43,7 +40,8 @@ module.exports = async () => {
   const histogram = macdResults.histogram;
   const latestIndicator = histogram[histogram.length - 1];
 
-  await updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
+  // noinspection ES6MissingAwait
+  updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
 
   const shouldSell = latestIndicator < -signalThreshold;
   const shouldBuy = latestIndicator > signalThreshold;
@@ -55,16 +53,17 @@ module.exports = async () => {
     action = 'BUY';
   }
 
-  await updateBrokerHistorySeries(bullConfig.name, 'status', action);
+  // noinspection ES6MissingAwait
+  updateBrokerHistorySeries(bullConfig.name, 'status', action);
 
   const srcPool = shouldSell ? bullConfig.name : bearConfig.name;
   const dstPool = shouldSell ? bearConfig.name : bullConfig.name;
 
+  console.log(`${ACTION} | ${action}`);
+
   if (!shouldSell && !shouldBuy) {
     return;
   }
-
-  console.log(`${ACTION} | ${action}`);
 
   const wallets = await readWallets();
 

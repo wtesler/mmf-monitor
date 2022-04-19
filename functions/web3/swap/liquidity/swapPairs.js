@@ -62,19 +62,32 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
     finishedDsts.push(dst);
   };
 
-  const swapProperDst = async (src) => {
-    if (isFinished(src)) {
-      return;
-    }
-    if (!isFinished(dstA)) {
-      await performSwap(src, dstA);
+  const assignDst = () => {
+    if (isFinished(dstA)) {
+      finishedDsts.push(dstA);
+      return dstA;
     } else if (!isFinished(dstB)) {
-      await performSwap(src, dstB);
+      finishedDsts.push(dstB);
+      return dstB;
+    } else {
+      throw new Error("No dst available. There is a problem with the logic.");
     }
   };
 
-  await swapProperDst(srcA);
-  await swapProperDst(srcB);
+  let swapAPromise = Promise.resolve();
+  let swapBPromise = Promise.resolve();
+
+  if (!isFinished(srcA)) {
+    const srcADst = assignDst();
+    swapAPromise = performSwap(srcA, srcADst);
+  }
+
+  if (!isFinished(srcB)) {
+    const srcBDst = assignDst();
+    swapBPromise = performSwap(srcB, srcBDst);
+  }
+
+  await Promise.all([swapAPromise, swapBPromise]);
 
   console.log(`${ACTION} | SUCCESS`);
 };

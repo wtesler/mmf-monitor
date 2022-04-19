@@ -1,6 +1,6 @@
 {
   "name": "mmf-monitor",
-  "description": "Cloud Functions which monitor MMF vault",
+  "description": "An algorithmic trader which swaps between staked Defi liquidity pools.",
   "scripts": {
     "lint": "eslint ..",
     "emulate": "firebase emulators:start --only functions",

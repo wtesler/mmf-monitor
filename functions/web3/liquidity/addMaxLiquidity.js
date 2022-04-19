@@ -25,8 +25,10 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
     const quoteAddress = TokenAddresses[quoteToken];
     const baseAddress = TokenAddresses[baseToken];
 
-    let quoteAmount = await readTokenBalance(quoteToken, wallet);
-    let baseAmount = await readTokenBalance(baseToken, wallet);
+    const quotePromise = readTokenBalance(quoteToken, wallet);
+    const basePromise = readTokenBalance(baseToken, wallet);
+
+    let [quoteAmount, baseAmount] = await Promise.all([quotePromise, basePromise]);
 
     console.log(`${ACTION} | WE HAVE ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
 

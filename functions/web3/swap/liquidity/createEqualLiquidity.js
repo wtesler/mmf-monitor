@@ -21,8 +21,10 @@ module.exports = async (pairAddress, wallet) => {
 
     console.log(`${ACTION} | PRICE RATIO: ${priceRatio}`);
 
-    const quoteAmount = await readTokenBalance(quoteToken, wallet);
-    const baseAmount = await readTokenBalance(baseToken, wallet);
+    const quotePromise = readTokenBalance(quoteToken, wallet);
+    const basePromise = readTokenBalance(baseToken, wallet);
+
+    const [quoteAmount, baseAmount] = await Promise.all([quotePromise, basePromise]);
 
     console.log(`${ACTION} | WE HAVE ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
 
@@ -30,7 +32,7 @@ module.exports = async (pairAddress, wallet) => {
 
     const tokenRatio = baseAmount ? basedQuoteAmount / baseAmount : 9999999999;
 
-    if (tokenRatio > 0.995 && tokenRatio < 1.005) {
+    if (tokenRatio > 0.99 && tokenRatio < 1.01) {
       console.log(`${ACTION} | TOKEN RATIO CLOSE ENOUGH. NO SWAPS NEEDED.`);
       return [null, null, null]; // Early exit.
     }

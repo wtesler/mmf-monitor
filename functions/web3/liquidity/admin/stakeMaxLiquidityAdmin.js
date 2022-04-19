@@ -10,5 +10,5 @@
 
   const stakedBalance = await stakeMaxLiquidity(TokenNames.MMF_USDC, wallet);
 
-  console.log(stakedBalance)
+  console.log(stakedBalance);
 })();

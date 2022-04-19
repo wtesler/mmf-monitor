@@ -1,10 +1,10 @@
 module.exports = async (tokenPairName, wallet) => {
   const {ethers} = require("ethers");
   const resilientTransact = require("../../web3/transact/resilientTransact");
-  const TokenAddresses = require("../../constants/TokenAddresses");
   const readTokenBalance = require("../token/readTokenBalance");
-  const FormatToken = require("../../constants/FormatToken");
   const signMeerkatLpMessage = require('./helper/signMeerkatLpMessage');
+  const TokenAddresses = require("../../constants/TokenAddresses");
+  const FormatToken = require("../../constants/FormatToken");
   const meerkatPairAbi = require('../token/abis/meerkat_pair_abi.json');
 
   const ACTION = `REMOVING MAX LIQUIDITY`;
