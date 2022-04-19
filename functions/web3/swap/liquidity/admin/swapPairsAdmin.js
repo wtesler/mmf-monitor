@@ -9,8 +9,8 @@
   const wallet = await prepareWallet(mnemonic);
 
   await swapPairs(
-    TokenNames.MMF, TokenNames.USDC,
     TokenNames.USDC, TokenNames.USDT,
+    TokenNames.USDC, TokenNames.DAI,
     wallet
   );
 

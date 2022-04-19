@@ -19,15 +19,15 @@ module.exports = class TokenDecimals {
     return 18;
   }
 
-  static get MMF_CRO() {
-    return 18; // QUESTIONABLE!
-  }
-
   static get MMF_USDC() {
-    return 18; // QUESTIONABLE!
+    return 18;
   }
 
   static get USDC_USDT() {
+    return 18;
+  }
+
+  static get DAI_USDC() {
     return 18;
   }
 };

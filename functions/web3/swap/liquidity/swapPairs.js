@@ -63,7 +63,7 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
   };
 
   const assignDst = () => {
-    if (isFinished(dstA)) {
+    if (!isFinished(dstA)) {
       finishedDsts.push(dstA);
       return dstA;
     } else if (!isFinished(dstB)) {

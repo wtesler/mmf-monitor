@@ -69,7 +69,7 @@ module.exports = async () => {
 
   const walletPromises = walletDatas.map(({mnemonic}) => prepareWallet(mnemonic));
 
-  const wallets = await Promise.all([walletPromises]);
+  const wallets = await Promise.all(walletPromises);
 
   const balancePromises = wallets.map(wallet => readStakedBalance(srcPool, wallet));
 

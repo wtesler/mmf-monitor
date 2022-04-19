@@ -13,7 +13,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email) => {
   const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
   const unstakeMaxLiquidity = require('../../liquidity/unstakeMaxLiquidity');
   const removeMaxLiquidity = require('../../liquidity/removeMaxLiquidity');
-  const createEqualLiquidity = require('../liquidity/createEqualLiquidity');
+  const createEvenLiquidity = require('../liquidity/createEvenLiquidity');
   const swapPairs = require('../liquidity/swapPairs');
   const TokenAddresses = require("../../../constants/TokenAddresses");
 
@@ -43,7 +43,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email) => {
     await removeMaxLiquidity(srcPool, wallet);
 
     // Even out broken-up tokens.
-    await createEqualLiquidity(srcAddress, wallet);
+    await createEvenLiquidity(srcAddress, wallet);
 
     // Swap src tokens with dst tokens.
     await swapPairs(srcA, srcB, dstA, dstB, wallet);

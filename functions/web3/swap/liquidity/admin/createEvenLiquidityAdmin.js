@@ -1,5 +1,5 @@
 (async () => {
-  const createEqualLiquidity = require("../createEqualLiquidity");
+  const createEvenLiquidity = require("../createEvenLiquidity");
   const prepareWallet = require("../../../wallet/prepareWallet");
   const TokenAddresses = require("../../../../constants/TokenAddresses");
   const readDefiMnemonic = require('../../../../secrets/specific/readDefiMnemonic');
@@ -8,8 +8,8 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  await createEqualLiquidity(
-    TokenAddresses.MMF_USDC,
+  await createEvenLiquidity(
+    TokenAddresses.USDC_USDT,
     wallet,
   );
 
