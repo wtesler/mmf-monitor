@@ -37,13 +37,13 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
 
     const tokenRatio = baseAmount ? basedQuoteAmount / baseAmount : 9999999999;
 
-
     if (tokenRatio < 1) {
       // We reduce base amount because RHS must be smaller than LHS.
       baseAmount *= tokenRatio;
-      // Arbitrary subtracting small amount to avoid any rounding errors.
-      baseAmount = baseAmount - (Math.pow(10, -6));
     }
+
+    // TODO Arbitrary subtracting small amount to avoid any rounding errors.
+    baseAmount = baseAmount - (Math.pow(10, -4));
 
     quoteAmount = FormatToken.toFixedDecimals(quoteAmount, TokenDecimals[quoteToken]);
     baseAmount = FormatToken.toFixedDecimals(baseAmount, TokenDecimals[baseToken]);
