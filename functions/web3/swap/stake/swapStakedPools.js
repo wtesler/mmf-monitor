@@ -21,7 +21,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email) => {
 
   const wallet = await prepareWallet(mnemonic);
 
-  const srcAddress = TokenAddresses[srcPool];
+  // const srcAddress = TokenAddresses[srcPool];
   const dstAddress = TokenAddresses[dstPool];
 
   console.log(`${ACTION} | ${srcPool} -> ${dstPool}`);
@@ -42,11 +42,20 @@ module.exports = async (srcPool, dstPool, mnemonic, email) => {
     // Breakup LP tokens
     await removeMaxLiquidity(srcPool, wallet);
 
-    // Even out broken-up tokens.
-    await createEvenLiquidity(srcAddress, wallet);
+    // TODO Is this really needed?
+    await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
 
     // Swap src tokens with dst tokens.
     await swapPairs(srcA, srcB, dstA, dstB, wallet);
+
+    // TODO Is this really needed?
+    await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
+
+    // Even out tokens.
+    await createEvenLiquidity(dstAddress, wallet);
+
+    // TODO Is this really needed?
+    await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
 
     // Create LP tokens.
     await addMaxLiquidity(dstA, dstB, dstAddress, wallet);
@@ -54,6 +63,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email) => {
     // Stake new LP tokens.
     await stakeMaxLiquidity(dstPool, wallet);
 
+    // Send Swap Confirmation Email.
     await sendInBlueClient.sendEmail(email, 5, {
       srcPool: srcPool,
       dstPool: dstPool

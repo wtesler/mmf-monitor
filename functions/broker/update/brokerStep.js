@@ -7,7 +7,7 @@ module.exports = async () => {
   const readStakedBalance = require('../../web3/token/readStakedBalance');
   const readWallets = require('../../wallets/read/readWallets');
   const prepareWallet = require('../../web3/wallet/prepareWallet');
-  const macd = require('macd');
+  const macdVelocity = require('../analysis/macdVelocity');
 
   const ACTION = `BROKER STEP`;
 
@@ -36,9 +36,12 @@ module.exports = async () => {
     return;
   }
 
-  const macdResults = macd(historyPoints, slowIndicatorPeriod, fastIndicatorPeriod, signalIndicatorPeriod);
-  const histogram = macdResults.histogram;
-  const latestIndicator = histogram[histogram.length - 1];
+  const latestIndicator = macdVelocity(
+    historyPoints,
+    slowIndicatorPeriod,
+    fastIndicatorPeriod,
+    signalIndicatorPeriod
+  );
 
   // noinspection ES6MissingAwait
   updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);

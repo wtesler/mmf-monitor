@@ -58,8 +58,6 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
     };
 
     await swapTokens(parameterFunction, wallet);
-
-    finishedDsts.push(dst);
   };
 
   const assignDst = () => {

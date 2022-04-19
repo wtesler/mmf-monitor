@@ -10,7 +10,7 @@
 
   await swapPairs(
     TokenNames.USDC, TokenNames.USDT,
-    TokenNames.USDC, TokenNames.DAI,
+    TokenNames.MMF, TokenNames.USDC,
     wallet
   );
 
