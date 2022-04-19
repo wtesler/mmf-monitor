@@ -37,8 +37,8 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
 
       let srcAmount = await readTokenBalance(src, wallet);
 
-      // TODO Why do we have to decrement a tiny value?
-      srcAmount = srcAmount - (Math.pow(10, -6));
+      // Why do we have to decrement a tiny value?
+      // srcAmount = srcAmount - (Math.pow(10, -6));
 
       srcAmount = FormatToken.toFixedDecimals(srcAmount, TokenDecimals[src]);
 

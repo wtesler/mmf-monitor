@@ -2,6 +2,7 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
   const {ethers} = require("ethers");
   const FormatToken = require("../../constants/FormatToken");
   const TokenAddresses = require("../../constants/TokenAddresses");
+  const TokenDecimals = require("../../constants/TokenDecimals");
   const NetworkNames = require("../../constants/NetworkNames");
   const DexScreenerClient = require("../../dexscreener/client/DexScreenerClient");
   const readTokenBalance = require("../../web3/token/readTokenBalance");
@@ -36,19 +37,19 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
 
     const tokenRatio = baseAmount ? basedQuoteAmount / baseAmount : 9999999999;
 
-    // TODO Arbitrary rounding to 6 decimal places. Why?
 
     if (tokenRatio < 1) {
       // We reduce base amount because RHS must be smaller than LHS.
       baseAmount *= tokenRatio;
+      // Arbitrary subtracting small amount to avoid any rounding errors.
       baseAmount = baseAmount - (Math.pow(10, -6));
     }
 
-    quoteAmount = FormatToken.toFixedDecimals(quoteAmount, 6);
-    baseAmount = FormatToken.toFixedDecimals(baseAmount, 6);
+    quoteAmount = FormatToken.toFixedDecimals(quoteAmount, TokenDecimals[quoteToken]);
+    baseAmount = FormatToken.toFixedDecimals(baseAmount, TokenDecimals[baseToken]);
 
-    const quoteMinAmount = FormatToken.toFixedDecimals(quoteAmount * 0.99, 6);
-    const baseMinAmount = FormatToken.toFixedDecimals(baseAmount * 0.99, 6);
+    const quoteMinAmount = FormatToken.toFixedDecimals(quoteAmount * 0.99, TokenDecimals[quoteToken]);
+    const baseMinAmount = FormatToken.toFixedDecimals(baseAmount * 0.99, TokenDecimals[baseToken]);
 
     console.log(`${ACTION} | USING ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
 
