@@ -44,11 +44,11 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
       baseAmount = baseAmount - (Math.pow(10, -6));
     }
 
-    quoteAmount = Number(quoteAmount.toFixed(6));
-    baseAmount = Number(baseAmount.toFixed(6));
+    quoteAmount = FormatToken.toFixedDecimals(quoteAmount, 6);
+    baseAmount = FormatToken.toFixedDecimals(baseAmount, 6);
 
-    const quoteMinAmount = Number((quoteAmount * 0.99).toFixed(6));
-    const baseMinAmount = Number((baseAmount * 0.99).toFixed(6));
+    const quoteMinAmount = FormatToken.toFixedDecimals(quoteAmount * 0.99, 6);
+    const baseMinAmount = FormatToken.toFixedDecimals(baseAmount * 0.99, 6);
 
     console.log(`${ACTION} | USING ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
 
@@ -71,7 +71,7 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
       quoteFormattedAmountMin,
       baseFormattedAmountMin,
       wallet.address,
-      Date.now() + 1000 * 60 * 2, // 2 minutes
+      Date.now() + 1000 * 60 * 1, // 1 minutes
     );
   });
 

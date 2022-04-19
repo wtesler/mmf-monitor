@@ -45,7 +45,7 @@ module.exports = async (pairAddress, wallet) => {
       const debaseMult = shouldGetQuoteValues ? (1 / priceRatio) : 1;
 
       let swapAmount = Math.abs(basedMiddleDifference * debaseMult);
-      swapAmount = Number(swapAmount.toFixed(TokenDecimals[token])); // Round off the decimal.
+      swapAmount = Number(FormatToken.toFixedDecimals(swapAmount, TokenDecimals[token]));
 
       const address = TokenAddresses[shouldGetQuoteValues ? quoteToken : baseToken];
 
@@ -56,7 +56,7 @@ module.exports = async (pairAddress, wallet) => {
     const [outToken, outSwapAmount, outAddress] = getInOrOutValues(tokenRatio <= 1);
 
     let outAmountMin = outSwapAmount * .99; // Slippage
-    outAmountMin = Number(outAmountMin.toFixed(TokenDecimals[outToken])); // Round off the decimal.
+    outAmountMin = FormatToken.toFixedDecimals(outAmountMin, TokenDecimals[outToken]);
 
     console.log(`${ACTION} | SWAPPING ${inSwapAmount} ${inToken} for atleast ${outAmountMin} ${outToken}.`);
 

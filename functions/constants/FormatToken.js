@@ -6,7 +6,7 @@ module.exports = class FormatToken {
     if (Number.isNaN(num)) {
       numStr = num;
     } else {
-      numStr = num.toLocaleString('fullwide', { useGrouping: false, maximumSignificantDigits: 21});
+      numStr = num.toLocaleString('fullwide', {useGrouping: false, maximumSignificantDigits: 21});
     }
     return ethers.utils.parseUnits(numStr, TokenDecimals[tokenName]);
   }
@@ -14,5 +14,9 @@ module.exports = class FormatToken {
   static parseToken(tokenName, value) {
     const TokenDecimals = require("./TokenDecimals");
     return value / (Math.pow(10, TokenDecimals[tokenName]));
+  }
+
+  static toFixedDecimals(number, decimals) {
+    return Math.trunc(number * Math.pow(10, decimals)) / Math.pow(10, decimals);
   }
 };

@@ -40,7 +40,7 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
       // TODO Why do we have to decrement a tiny value?
       srcAmount = srcAmount - (Math.pow(10, -6));
 
-      srcAmount = Number(srcAmount.toFixed(TokenDecimals[src])); // Round off the decimal.
+      srcAmount = FormatToken.toFixedDecimals(srcAmount, TokenDecimals[src]);
 
       // TODO This could be more strict.
       const dstAmountMin = 0;

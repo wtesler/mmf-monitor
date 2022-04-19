@@ -9,13 +9,13 @@ module.exports = (list, slow, fast, signal, verbose=false) => {
     histogramDiffs.push(histogram[i] - histogram[i - 1]);
   }
 
-  let mult = 1;
+  let tendencyMult = 1;
   const lastSign = Math.sign(histogramDiffs[histogramDiffs.length - 2]);
 
   for (let i = histogramDiffs.length - 3; i >= 0; i--) {
     const diff = histogramDiffs[i];
     if (Math.sign(diff) === lastSign) {
-      mult += 1;
+      tendencyMult += 1;
     } else {
       break;
     }
@@ -27,8 +27,8 @@ module.exports = (list, slow, fast, signal, verbose=false) => {
     console.log(`HISTOGRAM: ${histogram}`);
     console.log(`HISTOGRAM DIFFS: ${histogramDiffs}`);
     console.log(`LAST SIGN: ${lastSign}`);
-    console.log(`MULT: ${mult}`);
+    console.log(`MULT: ${tendencyMult}`);
   }
 
-  return currentDiff * mult;
+  return currentDiff * tendencyMult;
 };
