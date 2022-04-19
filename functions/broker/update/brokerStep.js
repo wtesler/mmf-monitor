@@ -4,9 +4,7 @@ module.exports = async () => {
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
   const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
-  const readStakedBalance = require('../../web3/token/readStakedBalance');
   const readWallets = require('../../wallets/read/readWallets');
-  const prepareWallet = require('../../web3/wallet/prepareWallet');
   const macdVelocity = require('../analysis/macdVelocity');
 
   const ACTION = `BROKER STEP`;
@@ -75,14 +73,6 @@ module.exports = async () => {
   const dstPool = shouldSell ? bearConfig.name : bullConfig.name;
 
   const walletDatas = await readWallets();
-
-  // const walletPromises = walletDatas.map(({mnemonic}) => prepareWallet(mnemonic));
-  //
-  // const wallets = await Promise.all(walletPromises);
-
-  // const balancePromises = wallets.map(wallet => readStakedBalance(srcPool, wallet));
-  //
-  // const balances = await Promise.all(balancePromises);
 
   for (let i = 0; i < walletDatas.length; i++) {
     const walletData = walletDatas[i];
