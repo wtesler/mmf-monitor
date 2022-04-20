@@ -63,7 +63,16 @@ module.exports = async () => {
     return;
   }
 
-  const lastAction = brokerHistory.status[brokerHistory.status.length - 1];
+  const statuses = brokerHistory.status;
+
+  let lastAction;
+  for (let i = statuses.length - 1; i >= 0; i--) {
+    const pastStatus = statuses[i];
+    if (pastStatus === 'NONE') {
+      continue;
+    }
+    lastAction = pastStatus;
+  }
 
   if (lastAction === action) {
     return;
