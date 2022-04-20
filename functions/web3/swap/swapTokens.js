@@ -7,8 +7,14 @@ module.exports = async (parameterFunction, wallet) => {
 
   const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
+  let formattedInValue;
+  let formattedOutMinValue;
+
   await resilientTransact(async () => {
     const [formattedIn, formattedOutMin, internalTransactions] = await parameterFunction();
+
+    formattedInValue = formattedIn;
+    formattedOutMinValue = formattedOutMin;
 
     if (formattedIn === null || formattedOutMin === null || internalTransactions === null) {
       console.log('SWAP TOKENS | NOT SWAPPING');
@@ -23,4 +29,6 @@ module.exports = async (parameterFunction, wallet) => {
       Date.now() + 1000 * 60 * 1, // 1 minutes
     );
   });
+
+  return [formattedInValue, formattedOutMinValue];
 };

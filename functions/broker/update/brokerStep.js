@@ -69,6 +69,7 @@ module.exports = async () => {
       continue;
     }
     lastAction = pastStatus;
+    break;
   }
 
   if (lastAction === action) {

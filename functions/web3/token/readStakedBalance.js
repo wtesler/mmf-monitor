@@ -20,6 +20,8 @@ module.exports = async (tokenName, wallet) => {
   }
 
   const balanceParsed = FormatToken.parseToken(tokenName, balanceNum);
+
+  return balanceParsed;
 };
 
 async function readBalance(contract, pid, wallet) {

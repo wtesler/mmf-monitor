@@ -53,7 +53,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
     }
 
     // Swap src tokens with dst tokens.
-    await swapPairs(srcA, srcB, dstA, dstB, wallet);
+    const [swapASummary, swapBSummary] = await swapPairs(srcA, srcB, dstA, dstB, wallet);
 
     if (!isSellSignal) {
       // TODO Is this really needed?
@@ -72,10 +72,23 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
       await stakeMaxLiquidity(dstPool, wallet);
     }
 
+    const createNoSwapMessage = token => {
+      return `Did not need to swap ${token}`;
+    };
+
+    const createSwapMessage = swapSummary => {
+      return `Swapped ${swapSummary.src.amount} ${swapSummary.src.name} for at least ${swapSummary.dst.amount} ${swapSummary.dst.name}`;
+    };
+
+    const swapAMessage = swapASummary ? createSwapMessage(swapASummary) : createNoSwapMessage(srcA);
+    const swapBMessage = swapBSummary ? createSwapMessage(swapBSummary) : createNoSwapMessage(srcB);
+
     // Send Swap Confirmation Email.
     await sendInBlueClient.sendEmail(email, 5, {
       srcPool: srcPool,
-      dstPool: dstPool
+      dstPool: dstPool,
+      swapAMessage: swapAMessage,
+      swapBMessage: swapBMessage,
     });
   }
 

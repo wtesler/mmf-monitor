@@ -8,7 +8,7 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  const balance = await readStakedBalance(TokenNames.USDC_USDT, wallet);
+  const balance = await readStakedBalance(TokenNames.MMF_USDC, wallet);
 
   console.log(balance);
 })();

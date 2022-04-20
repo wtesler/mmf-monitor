@@ -57,7 +57,12 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
       return [formattedInAmount, formattedOutAmountMin, internalTransactions];
     };
 
-    await swapTokens(parameterFunction, wallet);
+    const [formattedIn, formattedOutMin] = await swapTokens(parameterFunction, wallet);
+
+    const inAmountNum = FormatToken.parseToken(src, formattedIn);
+    const outAmountMinNum = FormatToken.parseToken(dst, formattedOutMin);
+
+    return {src: {name: src, amount: inAmountNum}, dst: {name: dst, amount: outAmountMinNum}};
   };
 
   const assignDst = () => {
@@ -72,8 +77,8 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
     }
   };
 
-  let swapAPromise = Promise.resolve();
-  let swapBPromise = Promise.resolve();
+  let swapAPromise = Promise.resolve(null);
+  let swapBPromise = Promise.resolve(null);
 
   if (!isFinished(srcA)) {
     const srcADst = assignDst();
@@ -85,7 +90,9 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
     swapBPromise = performSwap(srcB, srcBDst);
   }
 
-  await Promise.all([swapAPromise, swapBPromise]);
+  const [swapASummary, swapBSummary] = await Promise.all([swapAPromise, swapBPromise]);
 
   console.log(`${ACTION} | SUCCESS`);
+
+  return [swapASummary, swapBSummary];
 };
