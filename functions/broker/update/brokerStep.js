@@ -40,7 +40,8 @@ module.exports = async () => {
     signalIndicatorPeriod
   );
 
-  await updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
+  // noinspection ES6MissingAwait
+  updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
 
   const shouldSell = latestIndicator < -signalThreshold;
   const shouldBuy = latestIndicator > signalThreshold;
@@ -54,7 +55,8 @@ module.exports = async () => {
 
   console.log(`${ACTION} | ${action}`);
 
-  await updateBrokerHistorySeries(bullConfig.name, 'status', action);
+  // noinspection ES6MissingAwait
+  updateBrokerHistorySeries(bullConfig.name, 'status', action);
 
   if (action === 'NONE') {
     return;

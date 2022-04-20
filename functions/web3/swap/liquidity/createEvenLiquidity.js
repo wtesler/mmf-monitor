@@ -55,7 +55,7 @@ module.exports = async (pairAddress, wallet) => {
     const [inToken, inSwapAmount, inAddress] = getInOrOutValues(tokenRatio > 1);
     const [outToken, outSwapAmount, outAddress] = getInOrOutValues(tokenRatio <= 1);
 
-    let outAmountMin = outSwapAmount * .99; // Slippage
+    let outAmountMin = outSwapAmount * 0.99; // Slippage
     outAmountMin = FormatToken.toFixedDecimals(outAmountMin, TokenDecimals[outToken]);
 
     console.log(`${ACTION} | SWAPPING ${inSwapAmount} ${inToken} for atleast ${outAmountMin} ${outToken}.`);

@@ -5,5 +5,5 @@
 
   const mnemonic = await readDefiMnemonic();
 
-  await swapStakedPools(TokenNames.MMF_USDC, TokenNames.USDC_USDT, mnemonic, 'willtesler@gmail.com', 'SELL');
+  await swapStakedPools(TokenNames.USDC_USDT, TokenNames.MMF_USDC, mnemonic, 'willtesler@gmail.com', 'BUY');
 })();
