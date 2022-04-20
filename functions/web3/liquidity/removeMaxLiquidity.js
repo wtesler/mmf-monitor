@@ -51,9 +51,7 @@ module.exports = async (tokenPairName, wallet) => {
       nonce.toHexString()
     );
 
-    // console.log(`${ACTION} | SIGNED MESSAGE`);
-
-    return contract.removeLiquidityWithPermit(
+    const args = [
       addressTokenA,
       addressTokenB,
       tokenPairFormattedBalance,
@@ -65,7 +63,16 @@ module.exports = async (tokenPairName, wallet) => {
       v,
       r,
       s
-    );
+    ];
+
+    // console.log(`${ACTION} | SIGNED MESSAGE`);
+
+    const gasEstimate = await contract.estimateGas.removeLiquidityWithPermit(...args);
+
+    const gasPrice = gasEstimate.mul(1.1);
+    const gasLimit = gasPrice.mul(1.02);
+
+    return contract.removeLiquidityWithPermit(...args, {gasPrice, gasLimit});
   });
 
   console.log(`${ACTION} | SUCCESS`);

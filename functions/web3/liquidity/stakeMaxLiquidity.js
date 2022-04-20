@@ -3,7 +3,7 @@ module.exports = async (pairTokenName, wallet) => {
   const FormatToken = require("../../constants/FormatToken");
   const StakeContractPids = require("../../constants/StakeContractPids");
   const readTokenBalance = require("../../web3/token/readTokenBalance");
-  const readStakedBalance = require("../../web3/token/readStakedBalance");
+  // const readStakedBalance = require("../../web3/token/readStakedBalance");
   const resilientTransact = require("../../web3/transact/resilientTransact");
 
   const ACTION = `STAKING`;
@@ -22,12 +22,19 @@ module.exports = async (pairTokenName, wallet) => {
 
     const contract = new ethers.Contract(contractAddress, contractAbi, wallet);
 
-    return await contract.deposit(contractPid, pairTokenFormmattedBalance, '0x0000000000000000000000000000000000000000');
-  });
+    const args = [contractPid, pairTokenFormmattedBalance, '0x0000000000000000000000000000000000000000'];
 
-  const stakedBalance = await readStakedBalance(pairTokenName, wallet);
+    const gasEstimate = await contract.estimateGas.deposit(...args);
+
+    const gasPrice = gasEstimate.mul(1.1);
+    const gasLimit = gasPrice.mul(1.02);
+
+    return contract.deposit(...args, {gasPrice, gasLimit});
+  });
 
   console.log(`${ACTION} | SUCCESS`);
 
-  return stakedBalance;
+  // const stakedBalance = await readStakedBalance(pairTokenName, wallet);
+
+  // return stakedBalance;
 };

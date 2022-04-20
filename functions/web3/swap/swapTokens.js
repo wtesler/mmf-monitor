@@ -21,13 +21,20 @@ module.exports = async (parameterFunction, wallet) => {
       return null; // Early exit.
     }
 
-    return contract.swapExactTokensForTokens(
+    const args = [
       formattedIn,
       formattedOutMin,
       internalTransactions,
       wallet.address,
       Date.now() + 1000 * 60 * 1, // 1 minutes
-    );
+    ];
+
+    const gasEstimate = await contract.estimateGas.swapExactTokensForTokens(...args);
+
+    const gasPrice = gasEstimate.mul(1.1);
+    const gasLimit = gasPrice.mul(1.02);
+
+    return contract.swapExactTokensForTokens(...args, {gasPrice, gasLimit});
   });
 
   return [formattedInValue, formattedOutMinValue];

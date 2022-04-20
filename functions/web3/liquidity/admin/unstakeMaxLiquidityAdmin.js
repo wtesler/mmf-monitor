@@ -8,5 +8,5 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  await unstakeMaxLiquidity(TokenNames.USDC_USDT, wallet);
+  await unstakeMaxLiquidity(TokenNames.MMF_USDC, wallet);
 })();

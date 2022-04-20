@@ -33,7 +33,14 @@ module.exports = async (pairTokenName, wallet) => {
     const contractPid = StakeContractPids[pairTokenName];
     const contract = new ethers.Contract(contractAddress, contractAbi, wallet);
 
-    return contract.withdraw(contractPid, pairTokenFormmattedBalance);
+    const args = [contractPid, pairTokenFormmattedBalance];
+
+    const gasEstimate = await contract.estimateGas.withdraw(args);
+
+    const gasPrice = gasEstimate.mul(1.1);
+    const gasLimit = gasPrice.mul(1.02);
+
+    return contract.withdraw(...args, {gasPrice, gasLimit});
   });
 
   console.log(`${ACTION} | SUCCESS`);

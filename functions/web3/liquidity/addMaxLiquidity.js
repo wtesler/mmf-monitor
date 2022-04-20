@@ -64,7 +64,7 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
 
     const contract = new ethers.Contract(mmfMasterContractAddress, mmfMasterContractAbi, wallet);
 
-    return contract.addLiquidity(
+    const args = [
       quoteAddress,
       baseAddress,
       quoteFormattedAmount,
@@ -73,7 +73,14 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
       baseFormattedAmountMin,
       wallet.address,
       Date.now() + 1000 * 60 * 1, // 1 minutes
-    );
+    ];
+
+    const gasEstimate = await contract.estimateGas.addLiquidity(...args);
+
+    const gasPrice = gasEstimate.mul(1.1);
+    const gasLimit = gasPrice.mul(1.02);
+
+    return contract.addLiquidity(...args, {gasPrice, gasLimit});
   });
 
   console.log(`${ACTION} | SUCCESS`);
