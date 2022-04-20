@@ -28,8 +28,7 @@ module.exports = async () => {
   const signalThreshold = bullConfig.indicator.threshold;
 
   if (slowIndicatorPeriod > numHistoryPoints) {
-    // noinspection ES6MissingAwait
-    updateBrokerHistorySeries(bullConfig.name, 'status', 'NONE');
+    await updateBrokerHistorySeries(bullConfig.name, 'status', 'NONE');
     console.warn(`${ACTION} | waiting for more points before doing anything else.`);
     return;
   }
@@ -41,8 +40,7 @@ module.exports = async () => {
     signalIndicatorPeriod
   );
 
-  // noinspection ES6MissingAwait
-  updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
+  await updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
 
   const shouldSell = latestIndicator < -signalThreshold;
   const shouldBuy = latestIndicator > signalThreshold;
@@ -56,8 +54,7 @@ module.exports = async () => {
 
   console.log(`${ACTION} | ${action}`);
 
-  // noinspection ES6MissingAwait
-  updateBrokerHistorySeries(bullConfig.name, 'status', action);
+  await updateBrokerHistorySeries(bullConfig.name, 'status', action);
 
   if (action === 'NONE') {
     return;
@@ -75,6 +72,7 @@ module.exports = async () => {
   }
 
   if (lastAction === action) {
+    console.log(`${ACTION} | ACTION IS THE SAME AS LAST ACTION`);
     return;
   }
 

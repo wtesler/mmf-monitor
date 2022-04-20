@@ -2,14 +2,20 @@ module.exports = async (tokenName, wallet) => {
   const FormatToken = require("../../constants/FormatToken");
   const TokenNames = require("../../constants/TokenNames");
 
-  let balance;
+  let balanceNum;
   if (tokenName === TokenNames.CRO) {
-    balance = await wallet.provider.getBalance(wallet.address);
+    const balance = await wallet.provider.getBalance(wallet.address);
+    balanceNum = Number(balance.toString());
   } else {
-    balance = await readErc20Balance(tokenName, wallet);
-  }
+    balanceNum = await readErc20Balance(tokenName, wallet);
 
-  const balanceNum = Number(balance.toString());
+    // TODO: Why is this necessary? Why does balance not update properly sometimes?
+    if (balanceNum === 0) {
+      console.warn(`READ TOKEN BALANCE | TOKEN BALANCE WAS ZERO. TRYING AGAIN.`);
+      await new Promise(resolve => setTimeout(resolve, 20000)); // Sleep / Settle
+      balanceNum = await readErc20Balance(tokenName, wallet);
+    }
+  }
 
   const balanceParsed = FormatToken.parseToken(tokenName, balanceNum);
 
@@ -25,10 +31,12 @@ async function readErc20Balance(tokenName, wallet) {
 
   const contract = new ethers.Contract(tokenAddress, genericAbi, wallet);
 
-  // TODO Determined why calling it twice is needed to ensure it is up-to-date.
+  // TODO: Why does calling this twice make it more consistent?
   // noinspection JSUnusedAssignment
   let balance = await contract.balanceOf(wallet.address);
   balance = await contract.balanceOf(wallet.address);
 
-  return balance;
+  const balanceNum = Number(balance.toString());
+
+  return balanceNum;
 }

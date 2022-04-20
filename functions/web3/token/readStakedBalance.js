@@ -10,9 +10,20 @@ module.exports = async (tokenName, wallet) => {
 
   const pid = StakeContractPids[tokenName];
 
-  const userInfo = await contract.userInfo(pid, wallet.address);
+  let balanceNum = await readBalance(contract, pid, wallet);
 
-  // console.log(userInfo);
+  // TODO: Why is this necessary? Why does balance not update properly sometimes?
+  if (balanceNum === 0) {
+    console.warn(`READ STAKED BALANCE | STAKED BALANCE WAS ZERO. TRYING AGAIN.`);
+    await new Promise(resolve => setTimeout(resolve, 20000)); // Sleep / Settle
+    balanceNum = await readBalance(contract, pid, wallet);
+  }
+
+  const balanceParsed = FormatToken.parseToken(tokenName, balanceNum);
+};
+
+async function readBalance(contract, pid, wallet) {
+  const userInfo = await contract.userInfo(pid, wallet.address);
 
   const balance = userInfo.amount;
 
@@ -20,7 +31,5 @@ module.exports = async (tokenName, wallet) => {
 
   const balanceNum = Number(balance.toString());
 
-  const balanceParsed = FormatToken.parseToken(tokenName, balanceNum);
-
-  return balanceParsed;
-};
+  return balanceNum;
+}
