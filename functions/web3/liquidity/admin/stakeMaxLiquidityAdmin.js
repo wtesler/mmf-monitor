@@ -8,7 +8,5 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  const stakedBalance = await stakeMaxLiquidity(TokenNames.MMF_USDC, wallet);
-
-  console.log(stakedBalance);
+  await stakeMaxLiquidity(TokenNames.MMF_USDC, wallet);
 })();

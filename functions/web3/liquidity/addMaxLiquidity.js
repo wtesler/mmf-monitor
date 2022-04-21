@@ -48,8 +48,8 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
     quoteAmount = FormatToken.toFixedDecimals(quoteAmount, TokenDecimals[quoteToken]);
     baseAmount = FormatToken.toFixedDecimals(baseAmount, TokenDecimals[baseToken]);
 
-    const quoteMinAmount = FormatToken.toFixedDecimals(quoteAmount * 0.99, TokenDecimals[quoteToken]);
-    const baseMinAmount = FormatToken.toFixedDecimals(baseAmount * 0.99, TokenDecimals[baseToken]);
+    const quoteMinAmount = FormatToken.toFixedDecimals(quoteAmount * 0.985, TokenDecimals[quoteToken]);
+    const baseMinAmount = FormatToken.toFixedDecimals(baseAmount * 0.985, TokenDecimals[baseToken]);
 
     console.log(`${ACTION} | USING ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
 
@@ -75,12 +75,7 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
       Date.now() + 1000 * 60 * 1, // 1 minutes
     ];
 
-    const gasEstimate = await contract.estimateGas.addLiquidity(...args);
-
-    const gasPrice = gasEstimate.mul(1.1);
-    const gasLimit = gasPrice.mul(1.02);
-
-    return contract.addLiquidity(...args, {gasPrice, gasLimit});
+    return contract.addLiquidity(...args);
   });
 
   console.log(`${ACTION} | SUCCESS`);

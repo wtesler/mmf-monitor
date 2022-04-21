@@ -24,12 +24,7 @@ module.exports = async (pairTokenName, wallet) => {
 
     const args = [contractPid, pairTokenFormmattedBalance, '0x0000000000000000000000000000000000000000'];
 
-    const gasEstimate = await contract.estimateGas.deposit(...args);
-
-    const gasPrice = gasEstimate.mul(1.1);
-    const gasLimit = gasPrice.mul(1.02);
-
-    return contract.deposit(...args, {gasPrice, gasLimit});
+    return contract.deposit(...args);
   });
 
   console.log(`${ACTION} | SUCCESS`);

@@ -65,14 +65,7 @@ module.exports = async (tokenPairName, wallet) => {
       s
     ];
 
-    // console.log(`${ACTION} | SIGNED MESSAGE`);
-
-    const gasEstimate = await contract.estimateGas.removeLiquidityWithPermit(...args);
-
-    const gasPrice = gasEstimate.mul(1.1);
-    const gasLimit = gasPrice.mul(1.02);
-
-    return contract.removeLiquidityWithPermit(...args, {gasPrice, gasLimit});
+    return contract.removeLiquidityWithPermit(...args);
   });
 
   console.log(`${ACTION} | SUCCESS`);

@@ -17,24 +17,24 @@ module.exports = async () => {
   const pair = pairInfo.pair;
   const bullPriceUsd = pair.liquidity.quote / pair.liquidity.base;
 
-  const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'points', bullPriceUsd);
+  const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'prices', bullPriceUsd);
 
-  const historyPoints = brokerHistory.points;
-  const numHistoryPoints = historyPoints.length;
+  const historyPrices = brokerHistory.prices;
+  const numHistoryPrices = historyPrices.length;
 
   const fastIndicatorPeriod = bullConfig.indicator.period.fast;
   const slowIndicatorPeriod = bullConfig.indicator.period.slow;
   const signalIndicatorPeriod = bullConfig.indicator.period.signal;
   const signalThreshold = bullConfig.indicator.threshold;
 
-  if (slowIndicatorPeriod > numHistoryPoints) {
-    await updateBrokerHistorySeries(bullConfig.name, 'status', 'NONE');
+  if (slowIndicatorPeriod > numHistoryPrices) {
+    await updateBrokerHistorySeries(bullConfig.name, 'action', 'NONE');
     console.warn(`${ACTION} | waiting for more points before doing anything else.`);
     return;
   }
 
   const latestIndicator = macdVelocity(
-    historyPoints,
+    historyPrices,
     slowIndicatorPeriod,
     fastIndicatorPeriod,
     signalIndicatorPeriod
@@ -56,21 +56,21 @@ module.exports = async () => {
   console.log(`${ACTION} | ${action}`);
 
   // noinspection ES6MissingAwait
-  updateBrokerHistorySeries(bullConfig.name, 'status', action);
+  updateBrokerHistorySeries(bullConfig.name, 'action', action);
 
   if (action === 'NONE') {
     return;
   }
 
-  const statuses = brokerHistory.status;
+  const actions = brokerHistory.action;
 
   let lastAction;
-  for (let i = statuses.length - 1; i >= 0; i--) {
-    const pastStatus = statuses[i];
-    if (pastStatus === 'NONE') {
+  for (let i = actions.length - 1; i >= 0; i--) {
+    const pastAction = actions[i];
+    if (pastAction === 'NONE') {
       continue;
     }
-    lastAction = pastStatus;
+    lastAction = pastAction;
     break;
   }
 
