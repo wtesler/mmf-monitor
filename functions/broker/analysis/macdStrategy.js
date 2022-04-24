@@ -5,9 +5,11 @@ module.exports = (list, slow, fast, signal, verbose=false) => {
   const histogram = macdResults.histogram;
   const length = histogram.length;
 
-  const velocity = histogram[length - 1] - histogram[length - 2];
+  return histogram[length - 1];
 
-  return velocity;
+  // const velocity = histogram[length - 1] - histogram[length - 2];
+  //
+  // return velocity;
 
   // const histogramDiffs = [];
   // for (let i = 1; i < histogram.length; i++) {

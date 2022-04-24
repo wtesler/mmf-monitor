@@ -39,7 +39,7 @@ module.exports = async (tokenPairName, wallet) => {
     const meerkatPairContract = new ethers.Contract(lpAddress, meerkatPairAbi, wallet);
     const nonce = await meerkatPairContract.nonces(wallet.address);
 
-    const deadline = Date.now() + 1000 * 60 * 1; // 1 minutes
+    const deadline = Date.now() + 1000 * 60 * 2; // 2 minutes
 
     const [v, r, s] = await signMeerkatLpMessage(
       wallet,

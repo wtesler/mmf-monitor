@@ -1,5 +1,5 @@
 (() => {
-  const macdVelocity = require("../macdVelocity");
+  const macdVelocity = require("../macdStrategy");
   const value = macdVelocity([
     1.1291,
     1.1168,

@@ -11,7 +11,7 @@ module.exports = async (transactionAction) => {
 
   while (numAttempts < TOTAL_ATTEMPTS) {
     try {
-      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 60000, 'timeout')); // 1 minute.
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 120000, 'timeout')); // 2 minutes.
 
       const tx = await Promise.race([transactionAction(), timeoutPromise]);
 
@@ -38,17 +38,17 @@ module.exports = async (transactionAction) => {
       error = e;
       numAttempts++;
       if (numAttempts < TOTAL_ATTEMPTS) {
-        console.warn(`TRANSACTION FAILED. TRYING AGAIN AFTER PAUSE.`);
+        console.log(`TRANSACTION FAILED. TRYING AGAIN AFTER PAUSE.`);
         if (e.code === 'CALL_EXCEPTION') {
-          console.warn(e.reason);
+          console.log(e.reason);
         } if (e.code === 'SERVER_ERROR') {
-          console.warn(e.reason);
-          console.warn(e.body);
+          console.log(e.reason);
+          console.log(e.body);
         } else {
-          console.warn(e);
+          console.log(e);
         }
         await new Promise(resolve => setTimeout(resolve, 10000));
-        console.warn(`TRYING AGAIN.`);
+        console.log(`TRYING AGAIN.`);
       }
     }
   }

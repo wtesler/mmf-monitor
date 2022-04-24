@@ -26,7 +26,7 @@ module.exports = async (parameterFunction, wallet) => {
       formattedOutMin,
       internalTransactions,
       wallet.address,
-      Date.now() + 1000 * 60 * 1, // 1 minutes
+      Date.now() + 1000 * 60 * 2, // 2 minutes
     ];
 
     return contract.swapExactTokensForTokens(...args);

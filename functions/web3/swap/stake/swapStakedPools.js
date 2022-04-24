@@ -10,12 +10,12 @@
 module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
   const sendInBlueClient = await require('../../../sendinblue/client/SendInBlueClient');
   const prepareWallet = require('../../wallet/prepareWallet');
-  const addMaxLiquidity = require('../../liquidity/addMaxLiquidity');
-  const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
   const unstakeMaxLiquidity = require('../../liquidity/unstakeMaxLiquidity');
   const removeMaxLiquidity = require('../../liquidity/removeMaxLiquidity');
-  const createEvenLiquidity = require('../liquidity/createEvenLiquidity');
   const swapPairs = require('../liquidity/swapPairs');
+  const createEvenLiquidity = require('../liquidity/createEvenLiquidity');
+  const addMaxLiquidity = require('../../liquidity/addMaxLiquidity');
+  const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
   const TokenAddresses = require("../../../constants/TokenAddresses");
 
   const ACTION = `SWAP POOLS`;
@@ -55,7 +55,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
     // Swap src tokens with dst tokens.
     const [swapASummary, swapBSummary] = await swapPairs(srcA, srcB, dstA, dstB, wallet);
 
-    if (!isSellSignal) {
+    if (!isSellSignal) { // Buy Signal
       // TODO Is this really needed?
       await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
 
@@ -71,6 +71,8 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
       // Stake new LP tokens.
       await stakeMaxLiquidity(dstPool, wallet);
     }
+
+    // Send Confirmation Email
 
     const createNoSwapMessage = token => {
       return `Did not need to swap ${token}`;
