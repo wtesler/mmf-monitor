@@ -1,25 +1,24 @@
-module.exports = async (tokenName, wallet) => {
+module.exports = async (tokenName, wallet, shouldReturnBigNumber=false) => {
   const FormatToken = require("../../constants/FormatToken");
   const TokenNames = require("../../constants/TokenNames");
 
-  let balanceNum;
+  let balance;
   if (tokenName === TokenNames.CRO) {
-    const balance = await wallet.provider.getBalance(wallet.address);
-    balanceNum = Number(balance.toString());
+    balance = await wallet.provider.getBalance(wallet.address);
   } else {
-    balanceNum = await readErc20Balance(tokenName, wallet);
-
-    // TODO: Why is this necessary? Why does balance not update properly sometimes?
-    if (balanceNum === 0) {
-      console.warn(`READ TOKEN BALANCE | TOKEN BALANCE WAS ZERO. TRYING AGAIN.`);
-      await new Promise(resolve => setTimeout(resolve, 20000)); // Sleep / Settle
-      balanceNum = await readErc20Balance(tokenName, wallet);
+    balance = await readErc20Balance(tokenName, wallet);
+    if (balance.isZero()) {
+      // Try again if balance was zero just in case it needed time to update.
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Sleep
+      balance = await readErc20Balance(tokenName, wallet);
     }
   }
 
-  const balanceParsed = FormatToken.parseToken(tokenName, balanceNum);
-
-  return balanceParsed;
+  if (shouldReturnBigNumber) {
+    return balance;
+  } else {
+    return FormatToken.formatUnits(tokenName, balance);
+  }
 };
 
 async function readErc20Balance(tokenName, wallet) {
@@ -31,12 +30,7 @@ async function readErc20Balance(tokenName, wallet) {
 
   const contract = new ethers.Contract(tokenAddress, genericAbi, wallet);
 
-  // TODO: Why does calling this twice make it more consistent?
-  // noinspection JSUnusedAssignment
-  let balance = await contract.balanceOf(wallet.address);
-  balance = await contract.balanceOf(wallet.address);
+  const balance = await contract.balanceOf(wallet.address);
 
-  const balanceNum = Number(balance.toString());
-
-  return balanceNum;
+  return balance;
 }

@@ -11,9 +11,15 @@ module.exports = class FormatToken {
     return ethers.utils.parseUnits(numStr, TokenDecimals[tokenName]);
   }
 
-  static parseToken(tokenName, value) {
+  static formatUnits(tokenName, bigNumber) {
+    const {ethers} = require("ethers");
     const TokenDecimals = require("./TokenDecimals");
-    return value / (Math.pow(10, TokenDecimals[tokenName]));
+    return Number(ethers.utils.formatUnits(bigNumber, TokenDecimals[tokenName]));
+  }
+
+  static parseToken(tokenName, bigNumber) {
+    const TokenDecimals = require("./TokenDecimals");
+    return bigNumber / (Math.pow(10, TokenDecimals[tokenName]));
   }
 
   static toFixedDecimals(number, decimals) {

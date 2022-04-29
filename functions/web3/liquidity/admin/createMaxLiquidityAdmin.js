@@ -1,5 +1,5 @@
 (async () => {
-  const addMaxLiquidity = require("../addMaxLiquidity");
+  const createMaxLiquidity = require("../createMaxLiquidity");
   const prepareWallet = require("../../wallet/prepareWallet");
   const TokenNames = require("../../../constants/TokenNames");
   const TokenAddresses = require("../../../constants/TokenAddresses");
@@ -9,7 +9,7 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  const poolSizeUsd = await addMaxLiquidity(TokenNames.MMF, TokenNames.USDC, TokenAddresses.MMF_USDC, wallet);
+  const poolSizeUsd = await createMaxLiquidity(TokenNames.MMF, TokenNames.MUSD, TokenAddresses.MMF_MUSD, wallet);
 
   console.log(poolSizeUsd);
 })();

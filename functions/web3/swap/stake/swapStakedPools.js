@@ -14,7 +14,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
   const removeMaxLiquidity = require('../../liquidity/removeMaxLiquidity');
   const swapPairs = require('../liquidity/swapPairs');
   const createEvenLiquidity = require('../liquidity/createEvenLiquidity');
-  const addMaxLiquidity = require('../../liquidity/addMaxLiquidity');
+  const addMaxLiquidity = require('../../liquidity/createMaxLiquidity');
   const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
   const TokenAddresses = require("../../../constants/TokenAddresses");
 

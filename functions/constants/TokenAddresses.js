@@ -15,12 +15,20 @@ module.exports = class TokenAddresses {
     return '0x97749c9b61f878a880dfe312d2594ae07aed7656';
   }
 
+  static get MUSD() {
+    return '0x95aeaf383e2e86a47c11cffde1f7944ecb2c38c2';
+  }
+
   static get MMF_USDC() {
     return '0x722f19bd9a1e5ba97b3020c6028c279d27e4293c';
   }
 
   static get USDC_USDT() {
     return '0x6f186e4bed830d13dce638e40ba27fd6d91bad0b';
+  }
+
+  static get MMF_MUSD() {
+    return '0xeF2dC4849bDCC120acB7274cd5A557B5145DA149';
   }
 
   static get DAI_USDC() {

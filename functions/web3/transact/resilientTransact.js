@@ -11,14 +11,15 @@ module.exports = async (transactionAction) => {
 
   while (numAttempts < TOTAL_ATTEMPTS) {
     try {
-      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 120000, 'timeout')); // 2 minutes.
+      // const timeoutPromise = new Promise(resolve => setTimeout(resolve, 120000, 'timeout')); // 2 minutes.
 
-      const tx = await Promise.race([transactionAction(), timeoutPromise]);
+      // const tx = await Promise.race([transactionAction(), timeoutPromise]);
+      const tx = await transactionAction();
 
-      if (tx === 'timeout') {
-        // noinspection ExceptionCaughtLocallyJS
-        throw new Error('TIMEOUT WAITING FOR TRANSACTION');
-      }
+      // if (tx === 'timeout') {
+      //   // noinspection ExceptionCaughtLocallyJS
+      //   throw new Error('TIMEOUT WAITING FOR TRANSACTION');
+      // }
 
       if (tx === null) {
         return false; // Transaction Action was a NOOP.

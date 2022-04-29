@@ -15,12 +15,20 @@ module.exports = class TokenNames {
     return 'MMF';
   }
 
+  static get MUSD() {
+    return 'MUSD';
+  }
+
   static get CRO() {
     return 'CRO';
   }
 
   static get MMF_USDC() {
     return 'MMF_USDC';
+  }
+
+  static get MMF_MUSD() {
+    return 'MMF_MUSD';
   }
 
   static get USDC_USDT() {
