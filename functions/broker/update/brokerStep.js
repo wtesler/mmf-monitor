@@ -7,19 +7,23 @@ module.exports = async () => {
   const updateBrokerActionTimes = require('./updateBrokerActionTimes');
   const readWallets = require('../../wallets/read/readWallets');
   const smmaStrategy = require('../analysis/stratagies/smmaStrategy');
-  const brokerAction = require('./brokerAction');
 
   const ACTION = `BROKER STEP`;
 
   const config = await readBrokerConfig();
   const bullConfig = config.bull;
   const bearConfig = config.bear;
+  const isActive = config.isActive;
 
   const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, bullConfig.address);
   const pair = pairInfo.pair;
   const bullPrice = pair.liquidity.quote / pair.liquidity.base;
 
   const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'prices', bullPrice);
+
+  if (!isActive) {
+    return;
+  }
 
   const historyPrices = brokerHistory.prices;
   const numHistoryPrices = historyPrices.length;
