@@ -35,13 +35,16 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
 
       const srcBigNumber = await readTokenBalance(src, wallet);
 
-      console.log(`${ACTION} | ${srcBigNumber.toString()} ${src} for atleast ${0} ${dst}.`);
+      // TODO This could be more strict.
+      const dstBigNumberOut = '0x0';
+
+      console.log(`${ACTION} | ${srcBigNumber.toString()} ${src} for atleast ${dstBigNumberOut} ${dst}.`);
 
       const internalTransactions = [
         srcAddress, dstAddress
       ];
 
-      return [srcBigNumber, '0x0', internalTransactions];
+      return [srcBigNumber, dstBigNumberOut, internalTransactions];
     };
 
     const [formattedIn, formattedOutMin] = await swapTokens(parameterFunction, wallet);

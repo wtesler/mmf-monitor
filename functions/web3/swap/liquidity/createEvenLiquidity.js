@@ -51,7 +51,7 @@ module.exports = async (pairAddress, wallet) => {
     const [inToken, inSwapBigNumber, inAddress] = getInOrOutValues(tokenPercentage > 100);
     const [outToken, outSwapBigNumber, outAddress] = getInOrOutValues(tokenPercentage <= 100);
 
-    const outSwapBigNumberMin = outSwapBigNumber.mul(10000).div(9950); // Slippage
+    const outSwapBigNumberMin = outSwapBigNumber.mul(10000).div(9980); // Slippage
 
     console.log(`${ACTION} | SWAPPING ${inSwapBigNumber} ${inToken} for atleast ${outSwapBigNumberMin} ${outToken}.`);
 
