@@ -24,7 +24,7 @@ module.exports = async (pairTokenName, wallet) => {
 
     const args = [contractPid, amount, referrer];
 
-    return contract.deposit(...args);
+    return contract.deposit(...args, {gasPrice: 7000000000000});
   });
 
   console.log(`${ACTION} | SUCCESS`);

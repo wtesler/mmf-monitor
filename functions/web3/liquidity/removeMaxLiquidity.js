@@ -4,7 +4,6 @@ module.exports = async (tokenPairName, wallet) => {
   const readTokenBalance = require("../token/readTokenBalance");
   const signMeerkatLpMessage = require('./helper/signMeerkatLpMessage');
   const TokenAddresses = require("../../constants/TokenAddresses");
-  const FormatToken = require("../../constants/FormatToken");
   const meerkatPairAbi = require('../token/abis/meerkat_pair_abi.json');
 
   const ACTION = `REMOVING MAX LIQUIDITY`;
@@ -12,11 +11,9 @@ module.exports = async (tokenPairName, wallet) => {
   console.log(`${ACTION} | ${tokenPairName}`);
 
   await resilientTransact(async () => {
-    const tokenPairBalance = await readTokenBalance(tokenPairName, wallet);
+    const tokenPairBalanceBigNumber = await readTokenBalance(tokenPairName, wallet, true);
 
-    console.log(`${ACTION} | WE HAVE ${tokenPairBalance} ${tokenPairName}`);
-
-    const tokenPairFormattedBalance = FormatToken.formatToken(tokenPairName, tokenPairBalance);
+    console.log(`${ACTION} | WE HAVE ${tokenPairBalanceBigNumber.toString()} ${tokenPairName}`);
 
     // TODO This could be more strict.
     const tokenAMinAmount = '0x0';
@@ -46,7 +43,7 @@ module.exports = async (tokenPairName, wallet) => {
       lpAddress,
       contract,
       mmfMasterContractAddress,
-      tokenPairFormattedBalance,
+      tokenPairBalanceBigNumber,
       deadline,
       nonce.toHexString()
     );
@@ -54,7 +51,7 @@ module.exports = async (tokenPairName, wallet) => {
     const args = [
       addressTokenA,
       addressTokenB,
-      tokenPairFormattedBalance,
+      tokenPairBalanceBigNumber,
       tokenAMinAmount,
       tokenBMinAmount,
       wallet.address,
@@ -65,7 +62,7 @@ module.exports = async (tokenPairName, wallet) => {
       s
     ];
 
-    return contract.removeLiquidityWithPermit(...args);
+    return contract.removeLiquidityWithPermit(...args, {gasPrice: 7000000000000});
   });
 
   console.log(`${ACTION} | SUCCESS`);

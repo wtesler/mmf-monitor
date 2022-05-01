@@ -4,8 +4,10 @@ module.exports = async () => {
   const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require('../../constants/NetworkNames');
   const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
+  const updateBrokerActionTimes = require('./updateBrokerActionTimes');
   const readWallets = require('../../wallets/read/readWallets');
-  const macdVelocity = require('../analysis/macdStrategy');
+  const smmaStrategy = require('../analysis/stratagies/smmaStrategy');
+  const brokerAction = require('./brokerAction');
 
   const ACTION = `BROKER STEP`;
 
@@ -24,63 +26,59 @@ module.exports = async () => {
 
   const fastIndicatorPeriod = bullConfig.indicator.period.fast;
   const slowIndicatorPeriod = bullConfig.indicator.period.slow;
-  const signalIndicatorPeriod = bullConfig.indicator.period.signal;
-  const signalThreshold = bullConfig.indicator.threshold;
+  const threshold = bullConfig.indicator.threshold;
 
   if (slowIndicatorPeriod > numHistoryPrices) {
-    await updateBrokerHistorySeries(bullConfig.name, 'action', 'NONE');
+    // await updateBrokerHistorySeries(bullConfig.name, 'action', action);
     console.warn(`${ACTION} | waiting for more points before doing anything else.`);
     return;
   }
 
-  const latestIndicator = macdVelocity(
+  const latestIndicator = smmaStrategy(
     historyPrices,
     slowIndicatorPeriod,
-    fastIndicatorPeriod,
-    signalIndicatorPeriod
+    fastIndicatorPeriod
   );
 
   // noinspection ES6MissingAwait
-  updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
+  // updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
 
-  const shouldSell = latestIndicator < -signalThreshold;
-  const shouldBuy = latestIndicator > signalThreshold;
+  const actionHistory = brokerHistory.action;
+
+  const curAction = actionHistory.curAction;
+  const curActionTimeMs = actionHistory.curActionTimeMs;
+  const lastActionTimeMs = actionHistory.lastActionTimeMs;
+
+  //const [lastAction, currentStreak, previousStreak] = brokerAction(actions);
+
+  const currentStreakMs = Date.now() - curActionTimeMs;
+  const previousStreakMs = curActionTimeMs - lastActionTimeMs;
+
+  const isSellIndicator = latestIndicator < 0;
 
   let action = 'NONE';
-  if (shouldSell) {
-    action = 'SELL';
-  } else if (shouldBuy) {
-    action = 'BUY';
+
+  if (isSellIndicator && curAction === 'BUY' || !isSellIndicator && curAction === 'SELL') {
+    if (currentStreakMs / previousStreakMs > threshold) {
+      action = isSellIndicator ? 'SELL' : 'BUY';
+    } else {
+      console.log(`${ACTION} | WOULD CHANGE POSITION BUT WE DID SO TOO RECENTLY.`);
+    }
   }
 
   console.log(`${ACTION} | ${action}`);
 
   // noinspection ES6MissingAwait
-  updateBrokerHistorySeries(bullConfig.name, 'action', action);
+  // updateBrokerHistorySeries(bullConfig.name, 'action', action);
 
   if (action === 'NONE') {
     return;
   }
 
-  const actions = brokerHistory.action;
+  await updateBrokerActionTimes(bullConfig.name, curAction, curActionTimeMs, action);
 
-  let lastAction;
-  for (let i = actions.length - 1; i >= 0; i--) {
-    const pastAction = actions[i];
-    if (pastAction === 'NONE') {
-      continue;
-    }
-    lastAction = pastAction;
-    break;
-  }
-
-  if (lastAction === action) {
-    console.log(`${ACTION} | ACTION IS THE SAME AS LAST ACTION`);
-    return;
-  }
-
-  const srcPool = shouldSell ? bullConfig.name : bearConfig.name;
-  const dstPool = shouldSell ? bearConfig.name : bullConfig.name;
+  const srcPool = isSellIndicator ? bullConfig.name : bearConfig.name;
+  const dstPool = isSellIndicator ? bearConfig.name : bullConfig.name;
 
   const walletDatas = await readWallets();
 

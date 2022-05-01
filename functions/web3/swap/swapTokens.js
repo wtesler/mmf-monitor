@@ -29,7 +29,7 @@ module.exports = async (parameterFunction, wallet) => {
       Date.now() + 1000 * 60 * 2, // 2 minutes
     ];
 
-    return contract.swapExactTokensForTokens(...args);
+    return contract.swapExactTokensForTokens(...args, {gasPrice: 7000000000000});
   });
 
   return [formattedInValue, formattedOutMinValue];

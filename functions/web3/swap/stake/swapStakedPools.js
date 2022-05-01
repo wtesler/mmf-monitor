@@ -48,22 +48,14 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
     // Breakup LP tokens
     if (isSellSignal) {
       await removeMaxLiquidity(srcPool, wallet);
-      // TODO Is this really needed?
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
     }
 
     // Swap src tokens with dst tokens.
     const [swapASummary, swapBSummary] = await swapPairs(srcA, srcB, dstA, dstB, wallet);
 
     if (!isSellSignal) { // Buy Signal
-      // TODO Is this really needed?
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
-
       // Even out tokens.
       await createEvenLiquidity(dstAddress, wallet);
-
-      // TODO Is this really needed?
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Sleep
 
       // Create LP tokens.
       await addMaxLiquidity(dstA, dstB, dstAddress, wallet);

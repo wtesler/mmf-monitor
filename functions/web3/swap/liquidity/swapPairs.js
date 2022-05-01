@@ -2,8 +2,6 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
   const readTokenBalance = require('../../token/readTokenBalance');
   const swapTokens = require('../swapTokens');
   const TokenAddresses = require("../../../constants/TokenAddresses");
-  const TokenDecimals = require("../../../constants/TokenDecimals");
-  const FormatToken = require("../../../constants/FormatToken");
 
   const ACTION = `SWAPPING PAIRS`;
 
@@ -35,34 +33,20 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
       const srcAddress = TokenAddresses[src];
       const dstAddress = TokenAddresses[dst];
 
-      let srcAmount = await readTokenBalance(src, wallet);
+      const srcBigNumber = await readTokenBalance(src, wallet, true);
 
-      // TODO Why do we have to decrement a tiny value?
-      srcAmount = srcAmount - (Math.pow(10, -6));
-
-      srcAmount = FormatToken.toFixedDecimals(srcAmount, TokenDecimals[src]);
-
-      // TODO This could be more strict.
-      const dstAmountMin = 0;
-
-      console.log(`${ACTION} | ${srcAmount} ${src} for atleast ${dstAmountMin} ${dst}.`);
-
-      const formattedInAmount = FormatToken.formatToken(src, srcAmount);
-      const formattedOutAmountMin = FormatToken.formatToken(dst, dstAmountMin);
+      console.log(`${ACTION} | ${srcBigNumber.toString()} ${src} for atleast ${0} ${dst}.`);
 
       const internalTransactions = [
         srcAddress, dstAddress
       ];
 
-      return [formattedInAmount, formattedOutAmountMin, internalTransactions];
+      return [srcBigNumber, '0x0', internalTransactions];
     };
 
     const [formattedIn, formattedOutMin] = await swapTokens(parameterFunction, wallet);
 
-    const inAmountNum = FormatToken.parseToken(src, formattedIn);
-    const outAmountMinNum = FormatToken.parseToken(dst, formattedOutMin);
-
-    return {src: {name: src, amount: inAmountNum}, dst: {name: dst, amount: outAmountMinNum}};
+    return {src: {name: src, amount: formattedIn.toString()}, dst: {name: dst, amount: formattedOutMin.toString()}};
   };
 
   const assignDst = () => {

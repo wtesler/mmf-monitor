@@ -10,5 +10,6 @@
 
   const balance = await readTokenBalance(TokenNames.MMF, wallet, true);
 
+  console.log(balance);
   console.log(balance.toString());
 })();

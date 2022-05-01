@@ -19,28 +19,30 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
     const baseToken = pair.baseToken.symbol;
     poolSizeUsd = pair.liquidity.usd;
     const priceNative = pair.liquidity.quote / pair.liquidity.base;
-    const priceRatio = 1/priceNative;
+    const priceRatio = 1 / priceNative;
 
-    const quoteBigNumber = await readTokenBalance(quoteToken, wallet, true);
-    const baseBigNumber = await readTokenBalance(baseToken, wallet, true);
+    const quotePromise = readTokenBalance(quoteToken, wallet, true);
+    const basePromise = readTokenBalance(baseToken, wallet, true);
+
+    const [quoteBigNumber, baseBigNumber] = await Promise.all([quotePromise, basePromise]);
 
     console.log(`${ACTION} | WE HAVE ${quoteBigNumber.toString()} ${quoteToken} AND ${baseBigNumber.toString()} ${baseToken}`);
 
     const basedQuoteNumber = quoteBigNumber.mul(Math.floor(priceRatio * 10000)).div(10000);
 
-    const tokenPercentage = basedQuoteNumber.mul(100).div(baseBigNumber);
+    const tokenPercentage = basedQuoteNumber.mul(10000).div(baseBigNumber);
 
-    if (tokenPercentage.lt(70) || tokenPercentage.gt(130)) {
+    if (tokenPercentage.lt(7000) || tokenPercentage.gt(13000)) {
       throw new Error("Likely did not pull balances properly. Trying again.");
     }
 
-    if (tokenPercentage.lt(100)) {
+    if (tokenPercentage.lt(10000)) {
       // We reduce base amount because RHS must be smaller than LHS.
-      baseBigNumber.mul(tokenPercentage).div(100);
+      baseBigNumber.mul(tokenPercentage).div(10000);
     }
 
-    const quoteBigNumberMin = quoteBigNumber.mul(99).div(100);
-    const baseBigNumberMin = baseBigNumber.mul(99).div(100);
+    const quoteBigNumberMin = quoteBigNumber.mul(9980).div(10000);
+    const baseBigNumberMin = baseBigNumber.mul(9980).div(10000);
 
     const quoteAddress = TokenAddresses[quoteToken];
     const baseAddress = TokenAddresses[baseToken];
@@ -63,7 +65,7 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
       Date.now() + 1000 * 60 * 2, // 2 minutes
     ];
 
-    return contract.addLiquidity(...args);
+    return contract.addLiquidity(...args, {gasPrice: 7000000000000});
   });
 
   console.log(`${ACTION} | SUCCESS`);

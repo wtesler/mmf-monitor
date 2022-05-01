@@ -17,7 +17,8 @@ module.exports = async (formattedIn, formattedOut, internalTransactions, wallet)
       wallet.address,
       Date.now() + 1000 * 60 * 2, // 2 minutes
       {
-        value: formattedIn
+        value: formattedIn,
+        gasPrice: 7000000000000
       }
     );
   });

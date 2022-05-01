@@ -14,5 +14,5 @@ module.exports = async () => {
     await harvestRewardAndRestake(walletData);
   }
 
-  console.log(`${ACTION} | COMPLETED`);
+  console.log(`${ACTION} | SUCCESS`);
 };

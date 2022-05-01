@@ -27,6 +27,10 @@ module.exports = class TokenDecimals {
     return 18;
   }
 
+  static get MUSD_USDC() {
+    return 18;
+  }
+
   static get MMF_MUSD() {
     return 18;
   }

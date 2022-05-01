@@ -23,12 +23,20 @@ module.exports = class TokenNames {
     return 'CRO';
   }
 
+  static get SVN() {
+    return 'SVN';
+  }
+
   static get MMF_USDC() {
     return 'MMF_USDC';
   }
 
   static get MMF_MUSD() {
     return 'MMF_MUSD';
+  }
+
+  static get MUSD_USDC() {
+    return 'MUSD_USDC';
   }
 
   static get USDC_USDT() {

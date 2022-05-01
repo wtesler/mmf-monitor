@@ -19,6 +19,10 @@ module.exports = class TokenAddresses {
     return '0x95aeaf383e2e86a47c11cffde1f7944ecb2c38c2';
   }
 
+  static get SVN() {
+    return '0x654bAc3eC77d6dB497892478f854cF6e8245DcA9';
+  }
+
   static get MMF_USDC() {
     return '0x722f19bd9a1e5ba97b3020c6028c279d27e4293c';
   }
@@ -29,6 +33,10 @@ module.exports = class TokenAddresses {
 
   static get MMF_MUSD() {
     return '0xeF2dC4849bDCC120acB7274cd5A557B5145DA149';
+  }
+
+  static get MUSD_USDC() {
+    return '0x0B083d50417FEC1390C2C07Eba85f31D5EeFC350';
   }
 
   static get DAI_USDC() {

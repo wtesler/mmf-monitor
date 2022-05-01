@@ -1,13 +1,17 @@
 module.exports = async (walletData) => {
   const harvestFarmRewards = require("../../web3/liquidity/harvestFarmRewards");
   const readCompounderConfig = require('../read/readCompounderConfig');
-  const swapHalfLiquidity = require("../../web3/swap/liquidity/swapHalfLiquidity");
+  const swapBasic = require("../../web3/swap/liquidity/swapBasic");
   const createMaxLiquidity = require("../../web3/liquidity/createMaxLiquidity");
   const stakeMaxLiquidity = require("../../web3/liquidity/stakeMaxLiquidity");
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const readTokenBalance = require('../../web3/token/readTokenBalance');
   const TokenAddresses = require('../../constants/TokenAddresses');
   const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
+
+  const ACTION = `HARVESTING AND RESTAKING`;
+
+  console.log(`${ACTION} | STARTING`);
 
   const config = await readCompounderConfig();
   const pairName = config.pair;
@@ -32,14 +36,14 @@ module.exports = async (walletData) => {
   console.log(`WE HAVE ${rewardBigNumber.toString()} ${rewardToken} REWARD`);
 
   const halfRewardBigNumberA = rewardBigNumber.div(2);
-  const halfRewardBigNumberB = rewardBigNumber.div(2).sub(1);
+  const halfRewardBigNumberB = rewardBigNumber.div(2).add(rewardBigNumber.mod(2));
 
   if (tokenA !== rewardToken) {
-    await swapHalfLiquidity(rewardToken, tokenA, halfRewardBigNumberA, wallet);
+    await swapBasic(rewardToken, tokenA, halfRewardBigNumberA, wallet);
   }
 
   if (tokenB !== rewardToken) {
-    await swapHalfLiquidity(rewardToken, tokenB, halfRewardBigNumberB, wallet);
+    await swapBasic(rewardToken, tokenB, halfRewardBigNumberB, wallet);
   }
 
   await createMaxLiquidity(tokenA, tokenB, pairAddress, wallet);
@@ -50,4 +54,6 @@ module.exports = async (walletData) => {
   await sendInBlueClient.sendEmail(email, 7, {
     pairName: pairName
   });
+
+  console.log(`${ACTION} | SUCCESS`);
 };

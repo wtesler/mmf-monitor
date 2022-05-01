@@ -1,3 +1,6 @@
+/**
+ * DEPRECATED Has Not been used for a long time.
+ */
 module.exports = async (amountIn, amountOut, wallet) => {
   const FormatToken = require("../../../constants/FormatToken");
   const swapCro = require("../swapCro");

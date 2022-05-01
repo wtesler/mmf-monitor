@@ -1,7 +1,6 @@
 (async () => {
-  const swapHalfLiquidity = require("../swapHalfLiquidity");
+  const swapBasic = require("../swapBasic");
   const prepareWallet = require("../../../wallet/prepareWallet");
-  const TokenAddresses = require("../../../../constants/TokenAddresses");
   const TokenNames = require("../../../../constants/TokenNames");
   const readDefiMnemonic = require('../../../../secrets/specific/readDefiMnemonic');
 
@@ -9,10 +8,10 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  await swapHalfLiquidity(
+  await swapBasic(
+    TokenNames.SVN,
     TokenNames.MMF,
-    TokenNames.MUSD,
-    TokenAddresses.MMF_MUSD,
+    '0x017d62781d8fbf9a6abf',
     wallet
   );
 })();

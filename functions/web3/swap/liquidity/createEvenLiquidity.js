@@ -4,8 +4,6 @@ module.exports = async (pairAddress, wallet) => {
   const DexScreenerClient = require('../../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require("../../../constants/NetworkNames");
   const TokenAddresses = require("../../../constants/TokenAddresses");
-  const TokenDecimals = require("../../../constants/TokenDecimals");
-  const FormatToken = require("../../../constants/FormatToken");
 
   const ACTION = `CREATING EQUAL LIQUIDITY`;
 
@@ -21,53 +19,47 @@ module.exports = async (pairAddress, wallet) => {
 
     console.log(`${ACTION} | PRICE RATIO: ${priceRatio}`);
 
-    const quotePromise = readTokenBalance(quoteToken, wallet);
-    const basePromise = readTokenBalance(baseToken, wallet);
+    const quotePromise = readTokenBalance(quoteToken, wallet, true);
+    const basePromise = readTokenBalance(baseToken, wallet, true);
 
-    const [quoteAmount, baseAmount] = await Promise.all([quotePromise, basePromise]);
+    const [quoteBigNumber, baseBigNumber] = await Promise.all([quotePromise, basePromise]);
 
-    console.log(`${ACTION} | WE HAVE ${quoteAmount} ${quoteToken} AND ${baseAmount} ${baseToken}`);
+    console.log(`${ACTION} | WE HAVE ${quoteBigNumber} ${quoteToken} AND ${baseBigNumber} ${baseToken}`);
 
-    const basedQuoteAmount = quoteAmount * priceRatio;
+    const basedQuoteNumber = quoteBigNumber.mul(Math.floor(priceRatio * 10000)).div(10000);
 
-    const tokenRatio = baseAmount ? basedQuoteAmount / baseAmount : 9999999999;
+    const tokenPercentage = basedQuoteNumber.mul(10000).div(baseBigNumber);
 
-    if (tokenRatio > 0.99 && tokenRatio < 1.01) {
+    if (tokenPercentage.lt(9900) || tokenPercentage.gt(11000)) {
       console.log(`${ACTION} | TOKEN RATIO CLOSE ENOUGH. NO SWAPS NEEDED.`);
       return [null, null, null]; // Early exit.
     }
-
     const getInOrOutValues = (shouldGetQuoteValues) => {
-      const basedDifference = basedQuoteAmount - baseAmount;
-      const basedMiddleDifference = basedDifference / 2;
+      const basedDifference = basedQuoteNumber.sub(baseBigNumber);
+      const basedMiddleDifference = basedDifference.div(2);
 
       const token = shouldGetQuoteValues ? quoteToken : baseToken;
       const debaseMult = shouldGetQuoteValues ? (1 / priceRatio) : 1;
 
-      let swapAmount = Math.abs(basedMiddleDifference * debaseMult);
-      swapAmount = Number(FormatToken.toFixedDecimals(swapAmount, TokenDecimals[token]));
+      const swapAmountBigNumber = basedMiddleDifference.mul(debaseMult).abs();
 
       const address = TokenAddresses[shouldGetQuoteValues ? quoteToken : baseToken];
 
-      return [token, swapAmount, address];
+      return [token, swapAmountBigNumber, address];
     };
 
-    const [inToken, inSwapAmount, inAddress] = getInOrOutValues(tokenRatio > 1);
-    const [outToken, outSwapAmount, outAddress] = getInOrOutValues(tokenRatio <= 1);
+    const [inToken, inSwapBigNumber, inAddress] = getInOrOutValues(tokenPercentage > 100);
+    const [outToken, outSwapBigNumber, outAddress] = getInOrOutValues(tokenPercentage <= 100);
 
-    let outAmountMin = outSwapAmount * 0.985; // Slippage
-    outAmountMin = FormatToken.toFixedDecimals(outAmountMin, TokenDecimals[outToken]);
+    const outSwapBigNumberMin = outSwapBigNumber.mul(10000).div(9950); // Slippage
 
-    console.log(`${ACTION} | SWAPPING ${inSwapAmount} ${inToken} for atleast ${outAmountMin} ${outToken}.`);
-
-    const formattedInAmount = FormatToken.formatToken(inToken, inSwapAmount);
-    const formattedOutAmountMin = FormatToken.formatToken(outToken, outAmountMin);
+    console.log(`${ACTION} | SWAPPING ${inSwapBigNumber} ${inToken} for atleast ${outSwapBigNumberMin} ${outToken}.`);
 
     const internalTransactions = [
       inAddress, outAddress
     ];
 
-    return [formattedInAmount, formattedOutAmountMin, internalTransactions];
+    return [inSwapBigNumber, outSwapBigNumberMin, internalTransactions];
   };
 
   await swapTokens(parameterFunction, wallet);

@@ -7,7 +7,6 @@
  */
 module.exports = async (pairTokenName, wallet) => {
   const {ethers} = require("ethers");
-  const FormatToken = require("../../constants/FormatToken");
   const StakeContractPids = require("../../constants/StakeContractPids");
   const readStakedBalance = require("../../web3/token/readStakedBalance");
   const resilientTransact = require("../../web3/transact/resilientTransact");
@@ -18,12 +17,11 @@ module.exports = async (pairTokenName, wallet) => {
 
   // Will return a falsy value if unstaking was not required.
   const tx = await resilientTransact(async () => {
-    const pairTokenBalance = await readStakedBalance(pairTokenName, wallet);
-    const pairTokenFormmattedBalance = FormatToken.formatToken(pairTokenName, pairTokenBalance);
+    const pairTokenBalanceBigNumber = await readStakedBalance(pairTokenName, wallet);
 
-    console.log(`${ACTION} | Balance: ${pairTokenBalance} ${pairTokenName}`);
+    console.log(`${ACTION} | Balance: ${pairTokenBalanceBigNumber.toString()} ${pairTokenName}`);
 
-    if (pairTokenBalance === 0) {
+    if (pairTokenBalanceBigNumber.isZero()) {
       console.log(`${ACTION} | NO UNSTAKING REQUIRED`);
       return null; // NOOP
     }
@@ -33,9 +31,9 @@ module.exports = async (pairTokenName, wallet) => {
     const contractPid = StakeContractPids[pairTokenName];
     const contract = new ethers.Contract(contractAddress, contractAbi, wallet);
 
-    const args = [contractPid, pairTokenFormmattedBalance];
+    const args = [contractPid, pairTokenBalanceBigNumber];
 
-    return contract.withdraw(...args);
+    return contract.withdraw(...args, {gasPrice: 7000000000000});
   });
 
   console.log(`${ACTION} | SUCCESS`);
