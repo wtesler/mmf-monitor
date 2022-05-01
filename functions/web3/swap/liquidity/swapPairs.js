@@ -33,7 +33,7 @@ module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
       const srcAddress = TokenAddresses[src];
       const dstAddress = TokenAddresses[dst];
 
-      const srcBigNumber = await readTokenBalance(src, wallet, true);
+      const srcBigNumber = await readTokenBalance(src, wallet);
 
       console.log(`${ACTION} | ${srcBigNumber.toString()} ${src} for atleast ${0} ${dst}.`);
 

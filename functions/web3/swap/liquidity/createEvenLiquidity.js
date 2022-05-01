@@ -19,8 +19,8 @@ module.exports = async (pairAddress, wallet) => {
 
     console.log(`${ACTION} | PRICE RATIO: ${priceRatio}`);
 
-    const quotePromise = readTokenBalance(quoteToken, wallet, true);
-    const basePromise = readTokenBalance(baseToken, wallet, true);
+    const quotePromise = readTokenBalance(quoteToken, wallet);
+    const basePromise = readTokenBalance(baseToken, wallet);
 
     const [quoteBigNumber, baseBigNumber] = await Promise.all([quotePromise, basePromise]);
 

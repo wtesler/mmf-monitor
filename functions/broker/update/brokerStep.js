@@ -51,23 +51,24 @@ module.exports = async () => {
 
   const curAction = actionHistory.curAction;
   const curActionTimeMs = actionHistory.curActionTimeMs;
-  const lastActionTimeMs = actionHistory.lastActionTimeMs;
+  // const lastActionTimeMs = actionHistory.lastActionTimeMs;
 
-  //const [lastAction, currentStreak, previousStreak] = brokerAction(actions);
-
-  const currentStreakMs = Date.now() - curActionTimeMs;
-  const previousStreakMs = curActionTimeMs - lastActionTimeMs;
+  // const currentStreakMs = Date.now() - curActionTimeMs;
+  // const previousStreakMs = curActionTimeMs - lastActionTimeMs;
 
   const isSellIndicator = latestIndicator < 0;
 
   let action = 'NONE';
 
   if (isSellIndicator && curAction === 'BUY' || !isSellIndicator && curAction === 'SELL') {
-    if (currentStreakMs / previousStreakMs > threshold) {
-      action = isSellIndicator ? 'SELL' : 'BUY';
-    } else {
-      console.log(`${ACTION} | WOULD CHANGE POSITION BUT WE DID SO TOO RECENTLY.`);
-    }
+
+    action = isSellIndicator ? 'SELL' : 'BUY';
+
+    // if (currentStreakMs / previousStreakMs > threshold) {
+    //   action = isSellIndicator ? 'SELL' : 'BUY';
+    // } else {
+    //   console.log(`${ACTION} | WOULD CHANGE POSITION BUT WE DID SO TOO RECENTLY.`);
+    // }
   }
 
   console.log(`${ACTION} | ${action}`);

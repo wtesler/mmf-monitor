@@ -11,7 +11,7 @@ module.exports = async (tokenPairName, wallet) => {
   console.log(`${ACTION} | ${tokenPairName}`);
 
   await resilientTransact(async () => {
-    const tokenPairBalanceBigNumber = await readTokenBalance(tokenPairName, wallet, true);
+    const tokenPairBalanceBigNumber = await readTokenBalance(tokenPairName, wallet);
 
     console.log(`${ACTION} | WE HAVE ${tokenPairBalanceBigNumber.toString()} ${tokenPairName}`);
 

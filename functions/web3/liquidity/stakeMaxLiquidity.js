@@ -9,7 +9,7 @@ module.exports = async (pairTokenName, wallet) => {
   console.log(`${ACTION} | ${pairTokenName}`);
 
   await resilientTransact(async () => {
-    const pairBigNumber = await readTokenBalance(pairTokenName, wallet, true);
+    const pairBigNumber = await readTokenBalance(pairTokenName, wallet);
 
     console.log(`${ACTION} | Balance of ${pairBigNumber.toString()}`);
 

@@ -31,7 +31,7 @@ module.exports = async (walletData) => {
 
   await harvestFarmRewards(pairName, wallet);
 
-  const rewardBigNumber = await readTokenBalance(rewardToken, wallet, true);
+  const rewardBigNumber = await readTokenBalance(rewardToken, wallet);
 
   console.log(`WE HAVE ${rewardBigNumber.toString()} ${rewardToken} REWARD`);
 
