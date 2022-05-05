@@ -7,7 +7,12 @@ module.exports = class StakeContractPids {
     return 7;
   }
 
+  static get MUSD_USDC() {
+    return 33;
+  }
+
   static get MMF_MUSD() {
     return 34;
   }
+
 };

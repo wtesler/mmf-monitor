@@ -25,6 +25,10 @@ module.exports = async (pairTokenName, wallet) => {
 
     console.log(`${ACTION} | WE HAVE ${tokenABalance.toString()} ${tokenA} AND ${tokenBBalance.toString()} ${tokenB}`);
 
+    if (tokenABalance.isZero() || tokenBBalance.isZero()) {
+      throw new Error('Possibly did not pull balances properly. Trying again.');
+    }
+
     const adjustedABalance = FixedNumberUtils.Multiply(tokenABalance, priceNative);
 
     const tokenPercentage = FixedNumberUtils.Divide(adjustedABalance, tokenBBalance);
@@ -32,7 +36,7 @@ module.exports = async (pairTokenName, wallet) => {
     const tokenPercentageFloat = tokenPercentage.toUnsafeFloat();
 
     if (tokenPercentageFloat < .7 || tokenPercentageFloat > 1.3) {
-      throw new Error("Possibly did not pull balances properly. Trying again.");
+      throw new Error('Possibly did not pull balances properly. Trying again.');
     }
 
     if (tokenPercentageFloat < 1) {

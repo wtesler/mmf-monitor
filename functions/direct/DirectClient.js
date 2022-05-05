@@ -13,6 +13,7 @@ class DirectClient {
     this.HOST = "https://us-central1-mmf-monitor.cloudfunctions.net/";
 
     this.SWAP_STAKED_POOLS = "swapStakedPools";
+    this.HARVEST_RESTAKE = "harvestRewardAndRestake";
   }
 
   setToTest() {
@@ -38,6 +39,25 @@ class DirectClient {
       return serverResponse;
     } catch (e) {
       this._handleError(e, this.SWAP_STAKED_POOLS);
+      return null;
+    }
+  }
+
+  async harvestRewardAndRestake(walletData) {
+    const req = this.request
+      .post(this.HOST + this.HARVEST_RESTAKE)
+      .send({
+        walletData: walletData
+      })
+      .use(this._defaultHeaders())
+      .use(this._toResilient());
+
+    try {
+      const networkResponse = await req;
+      const serverResponse = this._toSuccessResponse(networkResponse);
+      return serverResponse;
+    } catch (e) {
+      this._handleError(e, this.HARVEST_RESTAKE);
       return null;
     }
   }

@@ -1,11 +1,11 @@
 module.exports = async (walletData) => {
   const harvestFarmRewards = require("../../web3/liquidity/harvestFarmRewards");
-  const readCompounderConfig = require('../read/readCompounderConfig');
   const swapBasic = require("../../web3/swap/liquidity/swapBasic");
   const createMaxLiquidity = require("../../web3/liquidity/createMaxLiquidity");
   const stakeMaxLiquidity = require("../../web3/liquidity/stakeMaxLiquidity");
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const readTokenBalance = require('../../web3/token/readTokenBalance');
+  const readStakedBalance = require('../../web3/token/readStakedBalance');
   const TokenNames = require('../../constants/TokenNames');
   const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
 
@@ -13,22 +13,25 @@ module.exports = async (walletData) => {
 
   console.log(`${ACTION} | STARTING`);
 
-  const config = await readCompounderConfig();
-  const pairName = config.pair;
-  const rewardToken = config.reward;
+  const {mnemonic, email, pairToken, rewardToken} = walletData;
 
-  const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairName);
-
-  const {mnemonic, email} = walletData;
+  const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
   const wallet = await prepareWallet(mnemonic);
 
+  const stakedBalanceBigNumber = await readStakedBalance(pairToken, wallet);
+
+  if (stakedBalanceBigNumber.isZero()) {
+    console.log(`No current stake of ${pairToken} so nothing to harvest.`);
+    return;
+  }
+
   // Compound started email.
   await sendInBlueClient.sendEmail(email, 6, {
-    pairName: pairName
+    pairName: pairToken
   });
 
-  await harvestFarmRewards(pairName, wallet);
+  await harvestFarmRewards(pairToken, wallet);
 
   // It can be good to give the rewards time to settle.
   await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep
@@ -48,13 +51,13 @@ module.exports = async (walletData) => {
     await swapBasic(rewardToken, tokenB, halfRewardBigNumberB, wallet);
   }
 
-  await createMaxLiquidity(pairName, wallet);
+  await createMaxLiquidity(pairToken, wallet);
 
-  await stakeMaxLiquidity(pairName, wallet);
+  await stakeMaxLiquidity(pairToken, wallet);
 
   // Compound finished email.
   await sendInBlueClient.sendEmail(email, 7, {
-    pairName: pairName
+    pairName: pairToken
   });
 
   console.log(`${ACTION} | SUCCESS`);

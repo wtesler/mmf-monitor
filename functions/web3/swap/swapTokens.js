@@ -23,10 +23,10 @@ module.exports = async (parameterFunction, wallet) => {
     srcBigNumberValue = srcBigNumber;
     dstMinBigNumberValue = dstMinBigNumber;
 
-    if (srcBigNumber === null
-      || dstMinBigNumber === null
-      || internalTransactions === null
-      || srcBigNumber.isZero()
+    if (srcBigNumber === null ||
+      dstMinBigNumber === null ||
+      internalTransactions === null ||
+      srcBigNumber.isZero()
     ) {
       console.log('SWAP TOKENS | NOT SWAPPING');
       return null; // Early exit.

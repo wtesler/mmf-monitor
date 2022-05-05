@@ -19,10 +19,10 @@ module.exports = (list, n) => {
   const sum = list.reduce((a, b) => a + b, 0);
 
   // Simple average of points.
-  const smma1 = sum / n;
+  const sma = sum / n;
 
   // Smoothed Moving Average.
-  const smma = (sum - smma1 + lastValue) / n;
+  const smma = (sum - sma + lastValue) / n;
 
   return smma;
 };
