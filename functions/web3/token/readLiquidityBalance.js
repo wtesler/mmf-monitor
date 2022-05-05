@@ -2,7 +2,7 @@ module.exports = async (pairTokenName, wallet) => {
   const {ethers, BigNumber} = require("ethers");
   const readTokenBalance = require('../token/readTokenBalance');
   const readLiquidity = require('./readLiquidity');
-  const pairAbi = require("./abis/meerkat_pair_abi.json");
+  const pairAbi = require("../contracts/abis/meerkat_pair_abi.json");
   const TokenAddresses = require("../../constants/TokenAddresses");
 
   const tokenAddress = TokenAddresses[pairTokenName];

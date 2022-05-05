@@ -19,7 +19,7 @@ module.exports = async (tokenName, wallet) => {
 
 async function readErc20Balance(tokenName, wallet) {
   const {ethers} = require("ethers");
-  const erc20Abi = require("./abis/generic_erc20_abi.json");
+  const erc20Abi = require("../contracts/abis/erc20_abi.json");
   const TokenAddresses = require("../../constants/TokenAddresses");
 
   const tokenAddress = TokenAddresses[tokenName];

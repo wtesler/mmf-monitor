@@ -1,6 +1,6 @@
 module.exports = async (pairTokenName, provider) => {
   const {ethers} = require("ethers");
-  const pairAbi = require("./abis/meerkat_pair_abi.json");
+  const pairAbi = require("../contracts/abis/meerkat_pair_abi.json");
   const TokenAddresses = require("../../constants/TokenAddresses");
   const TokenNames = require("../../constants/TokenNames");
 

@@ -1,4 +1,4 @@
-module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
+module.exports = async (srcToken, dstToken, srcBigNumber, wallet) => {
   const swapTokens = require('../swapTokens');
   const readNativePrice = require('../../token/readNativePrice');
   const TokenAddresses = require("../../../constants/TokenAddresses");
@@ -6,14 +6,14 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
 
   const ACTION = `SWAP BASIC`;
 
-  console.log(`${ACTION} | TOKENS: ${srcToken} / ${dstToken}`);
+  console.log(`${ACTION} | TOKENS: ${srcToken} -> ${dstToken}`);
 
-  if (srcInBigNumber.isZero()) {
+  if (srcBigNumber.isZero()) {
     console.warn("NO NEED TO SWAP BECAUSE SRC IN AMOUNT WAS ZERO");
     return null;
   }
 
-  let dstOutMinBigNumber;
+  let dstMinBigNumber;
 
   const parameterFunction = async () => {
     let pairTokenName = `${srcToken}_${dstToken}`;
@@ -30,7 +30,7 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
       priceNativeFixedNumber = FixedNumberUtils.Divide(1, priceNativeFixedNumber);
     }
 
-    const dstOutFixedNumber = FixedNumberUtils.AdjustToDecimals(srcToken, dstToken, srcInBigNumber);
+    const dstOutFixedNumber = FixedNumberUtils.AdjustToDecimals(srcToken, dstToken, srcBigNumber);
 
     // console.log(`DST OUT FIXED NUMBER: ${dstOutFixedNumber}`);
 
@@ -43,9 +43,9 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
 
     // console.log(`DST OUT MIN FIXED NUMBER: ${dstOutMinFixedNumber}`);
 
-    dstOutMinBigNumber = FixedNumberUtils.NumberToBigNumber(dstOutMinFixedNumber);
+    dstMinBigNumber = FixedNumberUtils.NumberToBigNumber(dstOutMinFixedNumber);
 
-    console.log(`${ACTION} | Swapping ${srcInBigNumber.toString()} ${srcToken} for atleast ${dstOutMinBigNumber.toString()} ${dstToken}.`);
+    console.log(`${ACTION} | Swapping ${srcBigNumber.toString()} ${srcToken} for atleast ${dstMinBigNumber.toString()} ${dstToken}.`);
 
     // return;
 
@@ -53,7 +53,7 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
       TokenAddresses[srcToken], TokenAddresses[dstToken]
     ];
 
-    return [srcInBigNumber, dstOutMinBigNumber, internalTransactions];
+    return [srcBigNumber, dstMinBigNumber, internalTransactions];
   };
 
   await swapTokens(parameterFunction, wallet);
@@ -62,11 +62,11 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
 
   return {
     src: {
-      amount: srcInBigNumber.toString(),
+      amount: srcBigNumber.toString(),
       name: srcToken
     },
     dst: {
-      amount: dstOutMinBigNumber.toString(),
+      amount: dstMinBigNumber.toString(),
       name: dstToken
     }
   };
