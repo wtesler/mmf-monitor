@@ -7,6 +7,7 @@ module.exports = async () => {
   const updateBrokerActionTimes = require('./updateBrokerActionTimes');
   const readWallets = require('../../wallets/read/readWallets');
   const smmaStrategy = require('../analysis/stratagies/smmaStrategy');
+  const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
 
   const ACTION = `BROKER STEP`;
 
@@ -20,10 +21,6 @@ module.exports = async () => {
   const bullPrice = pair.liquidity.quote / pair.liquidity.base;
 
   const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'prices', bullPrice);
-
-  if (!isActive) {
-    return;
-  }
 
   const historyPrices = brokerHistory.prices;
   const numHistoryPrices = historyPrices.length;
@@ -82,16 +79,28 @@ module.exports = async () => {
 
   await updateBrokerActionTimes(bullConfig.name, curAction, curActionTimeMs, action);
 
-  const srcPool = isSellIndicator ? bullConfig.name : bearConfig.name;
-  const dstPool = isSellIndicator ? bearConfig.name : bullConfig.name;
+  if (!isActive) {
+    return;
+  }
+
+  // const srcPool = isSellIndicator ? bullConfig.name : bearConfig.name;
+  // const dstPool = isSellIndicator ? bearConfig.name : bullConfig.name;
 
   const walletDatas = await readWallets();
 
   for (let i = 0; i < walletDatas.length; i++) {
     const walletData = walletDatas[i];
 
+    const {email} = walletData;
+
+    await sendInBlueClient.sendEmail(email, 8, {
+      signal: action,
+      pool: bullConfig.name,
+      price: bullPrice
+    });
+
     // Purposefully do not await this. It will start cloud function calls in the background.
     // noinspection ES6MissingAwait
-    triggerSwaps(action, srcPool, dstPool, bullPrice, walletData);
+    // triggerSwaps(action, srcPool, dstPool, bullPrice, walletData);
   }
 };

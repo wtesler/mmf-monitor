@@ -59,8 +59,8 @@ module.exports = async (tokenA, tokenB, pairAddress, wallet) => {
       baseAddress,
       quoteBigNumber,
       baseBigNumber,
-      '0x0',
-      '0x0',
+      quoteBigNumberMin,
+      baseBigNumberMin,
       wallet.address,
       Date.now() + 1000 * 60 * 2, // 2 minutes
     ];

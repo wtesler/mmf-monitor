@@ -4,6 +4,7 @@ module.exports = async (pairAddress, wallet) => {
   const DexScreenerClient = require('../../../dexscreener/client/DexScreenerClient');
   const NetworkNames = require("../../../constants/NetworkNames");
   const TokenAddresses = require("../../../constants/TokenAddresses");
+  const TokenDecimals = require("../../../constants/TokenDecimals");
 
   const ACTION = `CREATING EQUAL LIQUIDITY`;
 
@@ -22,7 +23,11 @@ module.exports = async (pairAddress, wallet) => {
     const quotePromise = readTokenBalance(quoteToken, wallet);
     const basePromise = readTokenBalance(baseToken, wallet);
 
-    const [quoteBigNumber, baseBigNumber] = await Promise.all([quotePromise, basePromise]);
+    let [quoteBigNumber, baseBigNumber] = await Promise.all([quotePromise, basePromise]);
+
+    baseBigNumber = baseBigNumber
+      .mul((Math.pow(10, TokenDecimals[quoteToken]) / Math.pow(10, TokenDecimals[baseToken])) * 10000000000000)
+      .div(10000000000000);
 
     console.log(`${ACTION} | WE HAVE ${quoteBigNumber} ${quoteToken} AND ${baseBigNumber} ${baseToken}`);
 
@@ -41,17 +46,21 @@ module.exports = async (pairAddress, wallet) => {
       const token = shouldGetQuoteValues ? quoteToken : baseToken;
       const debaseMult = shouldGetQuoteValues ? (1 / priceRatio) : 1;
 
-      const swapAmountBigNumber = basedMiddleDifference.mul(debaseMult).abs();
+      const swapAmountBigNumber = basedMiddleDifference.mul(Math.floor(debaseMult * 10000)).div(10000).abs();
 
       const address = TokenAddresses[shouldGetQuoteValues ? quoteToken : baseToken];
 
       return [token, swapAmountBigNumber, address];
     };
 
-    const [inToken, inSwapBigNumber, inAddress] = getInOrOutValues(tokenPercentage > 100);
-    const [outToken, outSwapBigNumber, outAddress] = getInOrOutValues(tokenPercentage <= 100);
+    const [inToken, inSwapBigNumber, inAddress] = getInOrOutValues(tokenPercentage > 10000);
+    const [outToken, outSwapBigNumber, outAddress] = getInOrOutValues(tokenPercentage <= 10000);
 
-    const outSwapBigNumberMin = outSwapBigNumber.mul(10000).div(9980); // Slippage
+    const outSwapBigNumberMin = outSwapBigNumber
+      .mul((Math.pow(10, TokenDecimals[outToken]) / Math.pow(10, TokenDecimals[inToken])) * 10000000000000)
+      .div(10000000000000)
+      .mul(99500)
+      .div(100000); // Slippage
 
     console.log(`${ACTION} | SWAPPING ${inSwapBigNumber} ${inToken} for atleast ${outSwapBigNumberMin} ${outToken}.`);
 

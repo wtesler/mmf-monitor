@@ -38,6 +38,8 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
 
   const isSellSignal = signal === 'SELL';
 
+  // START SMART CONTRACT CALLS
+
   // Unstake
   let didStakeExist = true;
   if (isSellSignal) {
@@ -63,6 +65,8 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
       // Stake new LP tokens.
       await stakeMaxLiquidity(dstPool, wallet);
     }
+
+    // FINISH SMART CONTRACT CALLS
 
     // Send Confirmation Email
 

@@ -1,5 +1,5 @@
 (async () => {
-  const readTokenBalance = require("../readTokenBalance");
+  const readLiquidityBalance = require("../readLiquidityBalance");
   const prepareWallet = require("../../wallet/prepareWallet");
   const TokenNames = require("../../../constants/TokenNames");
   const readDefiMnemonic = require('../../../secrets/specific/readDefiMnemonic');
@@ -8,8 +8,9 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  const balance = await readTokenBalance(TokenNames.MUSD, wallet);
+  const response = await readLiquidityBalance(TokenNames.MMF_MUSD, wallet);
 
-  console.log(balance);
-  console.log(balance.toString());
+  for (const key of Object.keys(response)) {
+    console.log(`${key}: ${response[key].toString()}`);
+  }
 })();

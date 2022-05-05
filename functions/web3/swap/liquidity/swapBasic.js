@@ -25,7 +25,7 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
     const isQuoteSrc = quoteToken === srcToken;
     const priceNative = (isQuoteSrc ? lBase : lQuote) / (isQuoteSrc ? lQuote : lBase);
 
-    const slippage = .998;
+    const slippage = .995;
     let roundingNum;
     let decimalAdjustment = Math.pow(10, TokenDecimals[dstToken]) / Math.pow(10, TokenDecimals[srcToken]);
     if (decimalAdjustment < 1) {
