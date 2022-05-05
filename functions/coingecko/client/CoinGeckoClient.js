@@ -52,7 +52,7 @@ class CoinGeckoClient {
     } else {
       errorText = e.toString();
     }
-    const error = new Error(`DexScreener ${endpoint} endpoint failed with text: ${errorText}`);
+    const error = new Error(`CoinGecko ${endpoint} endpoint failed with text: ${errorText}`);
     error.status = e.status;
     throw error;
   }

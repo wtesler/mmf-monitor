@@ -14,7 +14,7 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
   const removeMaxLiquidity = require('../../liquidity/removeMaxLiquidity');
   const swapPairs = require('../liquidity/swapPairs');
   const createEvenLiquidity = require('../liquidity/createEvenLiquidity');
-  const addMaxLiquidity = require('../../liquidity/createMaxLiquidity');
+  const createMaxLiquidity = require('../../liquidity/createMaxLiquidity');
   const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
   const TokenAddresses = require("../../../constants/TokenAddresses");
 
@@ -55,12 +55,12 @@ module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
     // Swap src tokens with dst tokens.
     const [swapASummary, swapBSummary] = await swapPairs(srcA, srcB, dstA, dstB, wallet);
 
-    if (!isSellSignal) { // Buy Signal
+    if (!isSellSignal) { // BUY SIGNAL
       // Even out tokens.
       await createEvenLiquidity(dstAddress, wallet);
 
       // Create LP tokens.
-      await addMaxLiquidity(dstA, dstB, dstAddress, wallet);
+      await createMaxLiquidity(dstPool, wallet);
 
       // Stake new LP tokens.
       await stakeMaxLiquidity(dstPool, wallet);

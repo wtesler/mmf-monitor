@@ -5,18 +5,18 @@
   const TokenNames = require("../../../../constants/TokenNames");
   const TokenDecimals = require("../../../../constants/TokenDecimals");
   const readDefiMnemonic = require('../../../../secrets/specific/readDefiMnemonic');
-  const {ethers} = require("ethers");
+  const {ethers, BigNumber} = require("ethers");
 
   const mnemonic = await readDefiMnemonic();
 
   const wallet = await prepareWallet(mnemonic);
 
-  const SRC_TOKEN = TokenNames.MUSD;
-  const DST_TOKEN = TokenNames.USDC;
-  // const AMOUNT_NUM = 5;
-  // const balanceBigNumber = ethers.utils.parseUnits(AMOUNT_NUM.toString(), TokenDecimals[SRC_TOKEN]);
-
-  const balanceBigNumber = await readTokenBalance(SRC_TOKEN, wallet);
+  const SRC_TOKEN = TokenNames.MMF;
+  const DST_TOKEN = TokenNames.MUSD;
+  const amount = 5;
+  const balanceBigNumber = ethers.utils.parseUnits(amount.toString(), TokenDecimals[SRC_TOKEN]);
+  // const balanceBigNumber = BigNumber.from('36705028177096034348');
+  // const balanceBigNumber = await readTokenBalance(SRC_TOKEN, wallet);
 
   await swapBasic(
     SRC_TOKEN,

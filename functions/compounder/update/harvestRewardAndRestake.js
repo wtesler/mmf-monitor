@@ -6,7 +6,7 @@ module.exports = async (walletData) => {
   const stakeMaxLiquidity = require("../../web3/liquidity/stakeMaxLiquidity");
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const readTokenBalance = require('../../web3/token/readTokenBalance');
-  const TokenAddresses = require('../../constants/TokenAddresses');
+  const TokenNames = require('../../constants/TokenNames');
   const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
 
   const ACTION = `HARVESTING AND RESTAKING`;
@@ -17,8 +17,7 @@ module.exports = async (walletData) => {
   const pairName = config.pair;
   const rewardToken = config.reward;
 
-  const pairAddress = TokenAddresses[pairName];
-  const [tokenA, tokenB] = pairName.split('_');
+  const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairName);
 
   const {mnemonic, email} = walletData;
 
@@ -30,6 +29,9 @@ module.exports = async (walletData) => {
   });
 
   await harvestFarmRewards(pairName, wallet);
+
+  // Empirically it can be good to give the rewards time to settle.
+  await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep
 
   const rewardBigNumber = await readTokenBalance(rewardToken, wallet);
 
@@ -46,7 +48,7 @@ module.exports = async (walletData) => {
     await swapBasic(rewardToken, tokenB, halfRewardBigNumberB, wallet);
   }
 
-  await createMaxLiquidity(tokenA, tokenB, pairAddress, wallet);
+  await createMaxLiquidity(pairName, wallet);
 
   await stakeMaxLiquidity(pairName, wallet);
 

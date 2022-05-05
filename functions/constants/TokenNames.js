@@ -1,4 +1,11 @@
 module.exports = class TokenNames {
+  static SplitTokenNames(pairTokenName) {
+    const tokens = pairTokenName.split('_');
+    const tokenA = tokens[0];
+    const tokenB = tokens[1];
+    return [tokenA, tokenB];
+  }
+
   static get USDC() {
     return 'USDC';
   }

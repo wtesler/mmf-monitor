@@ -20,6 +20,7 @@
     "space-before-function-paren": "off",
     "padded-blocks": "off",
     "camelcase": "off",
+    "new-cap": "off",
 
     // Removed rule "disallow the use of console" from recommended eslint rules
     "no-console": "off",

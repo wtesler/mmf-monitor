@@ -8,7 +8,7 @@
 
   const wallet = await prepareWallet(mnemonic);
 
-  const balance = await readTokenBalance(TokenNames.MUSD, wallet);
+  const balance = await readTokenBalance(TokenNames.MMF, wallet);
 
   console.log(balance);
   console.log(balance.toString());

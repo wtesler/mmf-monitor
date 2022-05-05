@@ -1,8 +1,8 @@
 module.exports = async () => {
   const triggerSwaps = require('./triggerSwaps');
   const readBrokerConfig = require('../read/readBrokerConfig');
-  const DexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
-  const NetworkNames = require('../../constants/NetworkNames');
+  const readNativePrice = require('../../web3/token/readNativePrice');
+  const prepareProvider = require('../../web3/wallet/prepareProvider');
   const updateBrokerHistorySeries = require('./updateBrokerHistorySeries');
   const updateBrokerActionTimes = require('./updateBrokerActionTimes');
   const readWallets = require('../../wallets/read/readWallets');
@@ -16,18 +16,26 @@ module.exports = async () => {
   const bearConfig = config.bear;
   const isActive = config.isActive;
 
-  const pairInfo = await DexScreenerClient.readPairInfo(NetworkNames.CRONOS, bullConfig.address);
-  const pair = pairInfo.pair;
-  const bullPrice = pair.liquidity.quote / pair.liquidity.base;
+  const bullPairToken = bullConfig.name;
+  const bearPairToken = bearConfig.name;
 
-  const brokerHistory = await updateBrokerHistorySeries(bullConfig.name, 'prices', bullPrice);
+  const bullIndicator = bullConfig.indicator;
+
+  const provider = prepareProvider();
+
+  console.log(bullPairToken);
+
+  const bullPrice = await readNativePrice(bullPairToken, provider);
+  const bullPriceFloat = bullPrice.toUnsafeFloat();
+
+  const brokerHistory = await updateBrokerHistorySeries(bullPairToken, 'prices', bullPriceFloat);
 
   const historyPrices = brokerHistory.prices;
   const numHistoryPrices = historyPrices.length;
 
-  const fastIndicatorPeriod = bullConfig.indicator.period.fast;
-  const slowIndicatorPeriod = bullConfig.indicator.period.slow;
-  const threshold = bullConfig.indicator.threshold;
+  const fastIndicatorPeriod = bullIndicator.period.fast;
+  const slowIndicatorPeriod = bullIndicator.period.slow;
+  // const threshold = bullIndicator.threshold;
 
   if (slowIndicatorPeriod > numHistoryPrices) {
     // await updateBrokerHistorySeries(bullConfig.name, 'action', action);
@@ -77,7 +85,7 @@ module.exports = async () => {
     return;
   }
 
-  await updateBrokerActionTimes(bullConfig.name, curAction, curActionTimeMs, action);
+  await updateBrokerActionTimes(bullPairToken, curAction, curActionTimeMs, action);
 
   if (!isActive) {
     return;
@@ -95,8 +103,8 @@ module.exports = async () => {
 
     await sendInBlueClient.sendEmail(email, 8, {
       signal: action,
-      pool: bullConfig.name,
-      price: bullPrice
+      pool: bullPairToken,
+      price: bullPriceFloat
     });
 
     // Purposefully do not await this. It will start cloud function calls in the background.

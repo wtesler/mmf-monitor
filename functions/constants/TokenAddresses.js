@@ -42,4 +42,8 @@ module.exports = class TokenAddresses {
   static get DAI_USDC() {
     return '0x787A47b0596fa8F7D6666F3C59696b3c57bB612b';
   }
+
+  static AreAddressesEqual(address1, address2) {
+    return address1.toLowerCase() === address2.toLowerCase();
+  }
 };

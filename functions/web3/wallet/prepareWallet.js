@@ -1,10 +1,8 @@
 module.exports = async (mnemonic) => {
   const {ethers} = require("ethers");
+  const prepareProvider = require("./prepareProvider");
 
-  const provider = new ethers.providers.JsonRpcProvider('https://evm.cronos.org', {
-    name: 'CRO',
-    chainId: 25
-  });
+  const provider = prepareProvider();
 
   const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
 
