@@ -30,12 +30,12 @@ module.exports = async (pairTokenName, wallet) => {
     const tokenPercentageFloat = tokenPercentage.toUnsafeFloat();
 
     if (tokenPercentageFloat < .7 || tokenPercentageFloat > 1.3) {
-      throw new Error("Likely did not pull balances properly. Trying again.");
+      throw new Error("Possibly did not pull balances properly. Trying again.");
     }
 
     if (tokenPercentageFloat < 1) {
       // We reduce base amount because RHS must be smaller than LHS.
-      tokenBBalance = FixedNumberUtils.Multiply(tokenPercentage);
+      tokenBBalance = FixedNumberUtils.Multiply(tokenBBalance, tokenPercentage);
     }
 
     const slippage = 0.995;

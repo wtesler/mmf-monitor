@@ -30,7 +30,7 @@ module.exports = async (walletData) => {
 
   await harvestFarmRewards(pairName, wallet);
 
-  // Empirically it can be good to give the rewards time to settle.
+  // It can be good to give the rewards time to settle.
   await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep
 
   const rewardBigNumber = await readTokenBalance(rewardToken, wallet);

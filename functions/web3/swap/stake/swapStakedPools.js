@@ -1,94 +1,89 @@
 /**
  * Swap from one staked LP pool to another.
  *
- * @param srcPool token pair name.
- * @param dstPool token pair name.
+ * @param bullPairToken token pair name.
+ * @param bearToken token name of the stable token to use when selling.
  * @param mnemonic The mnemonic of the wallet.
  * @param email The of the wallet.
  * @param signal 'BUY' or 'SELL' signal.
  */
-module.exports = async (srcPool, dstPool, mnemonic, email, signal) => {
+module.exports = async (bullPairToken, bearToken, mnemonic, email, signal) => {
   const sendInBlueClient = await require('../../../sendinblue/client/SendInBlueClient');
   const prepareWallet = require('../../wallet/prepareWallet');
   const unstakeMaxLiquidity = require('../../liquidity/unstakeMaxLiquidity');
   const removeMaxLiquidity = require('../../liquidity/removeMaxLiquidity');
-  const swapPairs = require('../liquidity/swapPairs');
-  const createEvenLiquidity = require('../liquidity/createEvenLiquidity');
+  const swapBasic = require('../liquidity/swapBasic');
+  const readTokenBalance = require('../../token/readTokenBalance');
   const createMaxLiquidity = require('../../liquidity/createMaxLiquidity');
   const stakeMaxLiquidity = require('../../liquidity/stakeMaxLiquidity');
-  const TokenAddresses = require("../../../constants/TokenAddresses");
+  const TokenNames = require("../../../constants/TokenNames");
 
   const ACTION = `SWAP POOLS`;
 
   const wallet = await prepareWallet(mnemonic);
 
-  // const srcAddress = TokenAddresses[srcPool];
-  const dstAddress = TokenAddresses[dstPool];
-
-  console.log(`${ACTION} | ${srcPool} -> ${dstPool}`);
-
-  const srcTokens = srcPool.split('_');
-  const dstTokens = dstPool.split('_');
-
-  const srcA = srcTokens[0];
-  const srcB = srcTokens[1];
-
-  const dstA = dstTokens[0];
-  const dstB = dstTokens[1];
-
   const isSellSignal = signal === 'SELL';
 
-  // START SMART CONTRACT CALLS
+  console.log(`${ACTION} | BULL PAIR: ${bullPairToken}, BEAR: ${bearToken}`);
 
-  // Unstake
-  let didStakeExist = true;
+  const [bullTokenA, bullTokenB] = TokenNames.SplitTokenNames(bullPairToken);
+
+  let swapASummary;
+  let swapBSummary;
+
   if (isSellSignal) {
-    didStakeExist = await unstakeMaxLiquidity(srcPool, wallet);
-  }
+    await unstakeMaxLiquidity(bullPairToken, wallet);
+    await removeMaxLiquidity(bullPairToken, wallet);
 
-  if (didStakeExist) {
-    // Breakup LP tokens
-    if (isSellSignal) {
-      await removeMaxLiquidity(srcPool, wallet);
+    // It can be good to give the rewards time to settle.
+    await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep
+
+    const bullTokenPromiseA = readTokenBalance(bullTokenA, wallet);
+    const bullTokenPromiseB = readTokenBalance(bullTokenB, wallet);
+    const [bullTokenABalanceBigNumber, bullTokenBBalanceBigNumber] = await Promise.all([
+      bullTokenPromiseA,
+      bullTokenPromiseB
+    ]);
+
+    if (bullTokenA !== bearToken) {
+      swapASummary = await swapBasic(bullTokenA, bearToken, bullTokenABalanceBigNumber, wallet);
     }
 
-    // Swap src tokens with dst tokens.
-    const [swapASummary, swapBSummary] = await swapPairs(srcA, srcB, dstA, dstB, wallet);
+    if (bullTokenB !== bearToken) {
+      swapBSummary = await swapBasic(bullTokenB, bearToken, bullTokenBBalanceBigNumber, wallet);
+    }
+  } else {
+    const bearTokenBalanceBigNumber = await readTokenBalance(bearToken, wallet);
+    const halfBearTokenBalanceA = bearTokenBalanceBigNumber.div(2);
+    const halfBearTokenBalanceB = bearTokenBalanceBigNumber.div(2).add(bearTokenBalanceBigNumber.mod(2));
 
-    if (!isSellSignal) { // BUY SIGNAL
-      // Even out tokens.
-      await createEvenLiquidity(dstAddress, wallet);
+    const isBearTokenBalanceZero = bearTokenBalanceBigNumber.isZero();
 
-      // Create LP tokens.
-      await createMaxLiquidity(dstPool, wallet);
-
-      // Stake new LP tokens.
-      await stakeMaxLiquidity(dstPool, wallet);
+    if (bullTokenA !== bearToken && !isBearTokenBalanceZero) {
+      swapASummary = await swapBasic(bearToken, bullTokenA, halfBearTokenBalanceA, wallet);
     }
 
-    // FINISH SMART CONTRACT CALLS
+    if (bullTokenB !== bearToken && !isBearTokenBalanceZero) {
+      swapBSummary = await swapBasic(bearToken, bullTokenB, halfBearTokenBalanceB, wallet);
+    }
 
-    // Send Confirmation Email
+    await createMaxLiquidity(bullPairToken, wallet);
 
-    const createNoSwapMessage = token => {
-      return `Did not need to swap ${token}`;
-    };
-
-    const createSwapMessage = swapSummary => {
-      return `Swapped ${swapSummary.src.amount} ${swapSummary.src.name} for at least ${swapSummary.dst.amount} ${swapSummary.dst.name}`;
-    };
-
-    const swapAMessage = swapASummary ? createSwapMessage(swapASummary) : createNoSwapMessage(srcA);
-    const swapBMessage = swapBSummary ? createSwapMessage(swapBSummary) : createNoSwapMessage(srcB);
-
-    // Send Swap Confirmation Email.
-    await sendInBlueClient.sendEmail(email, 5, {
-      srcPool: srcPool,
-      dstPool: dstPool,
-      swapAMessage: swapAMessage,
-      swapBMessage: swapBMessage,
-    });
+    await stakeMaxLiquidity(bullPairToken, wallet);
   }
+
+  const createSwapMessage = swapSummary => {
+    return `Swapped ${swapSummary.src.amount} ${swapSummary.src.name} for at least ${swapSummary.dst.amount} ${swapSummary.dst.name}`;
+  };
+
+  const swapAMessage = swapASummary ? createSwapMessage(swapASummary) : '';
+  const swapBMessage = swapBSummary ? createSwapMessage(swapBSummary) : '';
+
+  // Send Swap Confirmation Email.
+  await sendInBlueClient.sendEmail(email, 5, {
+    swapAMessage: swapAMessage,
+    swapBMessage: swapBMessage,
+  });
 
   console.log(`${ACTION} | SUCCESS`);
 };

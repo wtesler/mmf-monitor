@@ -1,3 +1,6 @@
+/**
+ * Deprecated not used.
+ */
 module.exports = async (srcA, srcB, dstA, dstB, wallet) => {
   const readTokenBalance = require('../../token/readTokenBalance');
   const swapTokens = require('../swapTokens');

@@ -6,15 +6,16 @@ module.exports = [
   secretRest(async (req, res) => {
     const {parameterError} = require("cranny");
 
-    const srcPool = req.body.srcPool;
-    const dstPool = req.body.dstPool;
+    const bullPairToken = req.body.bullPairToken;
+    const bearToken = req.body.bearToken;
     const mnemonic = req.body.mnemonic;
     const email = req.body.email;
     const signal = req.body.signal;
-    if (!srcPool || !dstPool || !mnemonic || !email || !signal) {
+
+    if (!bullPairToken || !bearToken || !mnemonic || !email || !signal) {
       parameterError(req);
     }
 
-    return await swapStakedPools(srcPool, dstPool, mnemonic, email, signal);
+    return await swapStakedPools(bullPairToken, bearToken, mnemonic, email, signal);
   }, 'direct')
 ];

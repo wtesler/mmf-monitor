@@ -8,7 +8,14 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
 
   console.log(`${ACTION} | TOKENS: ${srcToken} / ${dstToken}`);
 
-  const parameterFunction = async() => {
+  if (srcInBigNumber.isZero()) {
+    console.warn("NO NEED TO SWAP BECAUSE SRC IN AMOUNT WAS ZERO");
+    return null;
+  }
+
+  let dstOutMinBigNumber;
+
+  const parameterFunction = async () => {
     let pairTokenName = `${srcToken}_${dstToken}`;
     let didFlipPair = false;
     const address = TokenAddresses[pairTokenName];
@@ -36,7 +43,7 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
 
     // console.log(`DST OUT MIN FIXED NUMBER: ${dstOutMinFixedNumber}`);
 
-    const dstOutMinBigNumber = FixedNumberUtils.NumberToBigNumber(dstOutMinFixedNumber);
+    dstOutMinBigNumber = FixedNumberUtils.NumberToBigNumber(dstOutMinFixedNumber);
 
     console.log(`${ACTION} | Swapping ${srcInBigNumber.toString()} ${srcToken} for atleast ${dstOutMinBigNumber.toString()} ${dstToken}.`);
 
@@ -52,4 +59,15 @@ module.exports = async (srcToken, dstToken, srcInBigNumber, wallet) => {
   await swapTokens(parameterFunction, wallet);
 
   console.log(`${ACTION} | SUCCESS`);
+
+  return {
+    src: {
+      amount: srcInBigNumber.toString(),
+      name: srcToken
+    },
+    dst: {
+      amount: dstOutMinBigNumber.toString(),
+      name: dstToken
+    }
+  };
 };

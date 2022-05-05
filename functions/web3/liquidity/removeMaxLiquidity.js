@@ -5,6 +5,7 @@ module.exports = async (tokenPairName, wallet) => {
   const readLiquidityBalance = require("../token/readLiquidityBalance");
   const signMeerkatLpMessage = require('./helper/signMeerkatLpMessage');
   const TokenAddresses = require("../../constants/TokenAddresses");
+  const FixedNumberUtils = require("../../numbers/FixedNumberUtils");
   const meerkatPairAbi = require('../token/abis/meerkat_pair_abi.json');
 
   const ACTION = `REMOVING MAX LIQUIDITY`;
@@ -49,9 +50,18 @@ module.exports = async (tokenPairName, wallet) => {
     const liquidityBalanceABigNumber = liquidityBalance[tokenAName];
     const liquidityBalanceBBigNumber = liquidityBalance[tokenBName];
 
+    if (liquidityBalanceABigNumber.isZero() || liquidityBalanceBBigNumber.isZero()) {
+      throw new Error('Possibly did not pull balances properly. Trying again.');
+    }
+
     const slippage = .995;
-    const tokenAMinAmountBigNumber = liquidityBalanceABigNumber.mul(slippage);
-    const tokenBMinAmountBigNumber = liquidityBalanceBBigNumber.mul(slippage);
+    const tokenAMinAmountFixedNumber = FixedNumberUtils.Multiply(liquidityBalanceABigNumber, slippage);
+    const tokenBMinAmountFixedNumber = FixedNumberUtils.Multiply(liquidityBalanceBBigNumber, slippage);
+
+    const tokenAMinAmountBigNumber = FixedNumberUtils.NumberToBigNumber(tokenAMinAmountFixedNumber);
+    const tokenBMinAmountBigNumber = FixedNumberUtils.NumberToBigNumber(tokenBMinAmountFixedNumber);
+
+    console.log(`${ACTION} | WE WILL GET AT LEAST ${tokenAMinAmountBigNumber.toString()} ${tokenAName} and ${tokenBMinAmountBigNumber.toString()} ${tokenBName}`);
 
     const args = [
       addressTokenA,

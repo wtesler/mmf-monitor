@@ -14,16 +14,14 @@ module.exports = async () => {
   const config = await readBrokerConfig();
   const bullConfig = config.bull;
   const bearConfig = config.bear;
-  const isActive = config.isActive;
+  const status = config.status;
 
   const bullPairToken = bullConfig.name;
-  const bearPairToken = bearConfig.name;
+  const bearToken = bearConfig.name;
 
   const bullIndicator = bullConfig.indicator;
 
   const provider = prepareProvider();
-
-  console.log(bullPairToken);
 
   const bullPrice = await readNativePrice(bullPairToken, provider);
   const bullPriceFloat = bullPrice.toUnsafeFloat();
@@ -87,7 +85,7 @@ module.exports = async () => {
 
   await updateBrokerActionTimes(bullPairToken, curAction, curActionTimeMs, action);
 
-  if (!isActive) {
+  if (status === 'stopped') {
     return;
   }
 
@@ -99,16 +97,19 @@ module.exports = async () => {
   for (let i = 0; i < walletDatas.length; i++) {
     const walletData = walletDatas[i];
 
-    const {email} = walletData;
+    if (status === 'email') {
+      const {email} = walletData;
+      await sendInBlueClient.sendEmail(email, 8, {
+        signal: action,
+        pool: bullPairToken,
+        price: bullPriceFloat
+      });
+    }
 
-    await sendInBlueClient.sendEmail(email, 8, {
-      signal: action,
-      pool: bullPairToken,
-      price: bullPriceFloat
-    });
-
-    // Purposefully do not await this. It will start cloud function calls in the background.
-    // noinspection ES6MissingAwait
-    // triggerSwaps(action, srcPool, dstPool, bullPrice, walletData);
+    if (status === 'running') {
+      // Purposefully do not await this. It will start cloud function calls in the background.
+      // noinspection ES6MissingAwait
+      triggerSwaps(action, bullPairToken, bearToken, bullPrice, walletData);
+    }
   }
 };
