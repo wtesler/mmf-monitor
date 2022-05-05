@@ -48,7 +48,7 @@ module.exports = async () => {
   );
 
   // noinspection ES6MissingAwait
-  // updateBrokerHistorySeries(bullConfig.name, 'indicator', latestIndicator);
+  updateBrokerHistorySeries(bullPairToken, 'indicator', latestIndicator);
 
   const actionHistory = brokerHistory.action;
 
@@ -109,7 +109,7 @@ module.exports = async () => {
     if (status === 'running') {
       // Purposefully do not await this. It will start cloud function calls in the background.
       // noinspection ES6MissingAwait
-      triggerSwaps(action, bullPairToken, bearToken, bullPrice, walletData);
+      triggerSwaps(action, bullPairToken, bearToken, bullPriceFloat, walletData);
     }
   }
 };

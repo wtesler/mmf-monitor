@@ -1,3 +1,6 @@
+/**
+ * Deprecated Not in use.
+ */
 module.exports = async (pairAddress, wallet) => {
   const readTokenBalance = require('../../token/readTokenBalance');
   const swapTokens = require('../swapTokens');
