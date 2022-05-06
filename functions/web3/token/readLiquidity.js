@@ -11,10 +11,11 @@ module.exports = async (pairTokenName, provider) => {
 
   const contract = new ethers.Contract(tokenAddress, pairAbi, provider);
 
-  const quoteAddress = await contract.token0();
-  const baseAddress = await contract.token1();
+  const [quoteAddress, reserves] = await Promise.all([
+    contract.token0(),
+    contract.getReserves()
+  ]);
 
-  const reserves = await contract.getReserves();
   const quoteReserve = reserves[0];
   const baseReserve = reserves[1];
 
