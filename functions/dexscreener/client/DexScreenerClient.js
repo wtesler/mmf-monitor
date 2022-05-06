@@ -1,15 +1,23 @@
+const NetworkNames = require('../../constants/NetworkNames');
+
 class DexScreenerClient {
+
   constructor() {
     this.request = require("superagent");
 
     this.DOMAIN = `https://api.dexscreener.io`;
     this.HOST = `${this.DOMAIN}/latest`;
 
+    this.DOMAIN2 = `https://io.dexscreener.com`;
+    this.HOST2 = `${this.DOMAIN}/u`;
+
     this.DEX = 'dex';
     this.PAIRS = 'pairs';
+    this.CHART = 'chart';
+    this.BARS = 'bars';
   }
 
-  async readPairInfo(chainName, pairAddress) {
+  async readPairInfo(pairAddress, chainName=NetworkNames.CRONOS) {
     const req = this.request
       .get(`${this.HOST}/${this.DEX}/${this.PAIRS}/${chainName}/${pairAddress}`)
       .use(this._defaultHeaders())

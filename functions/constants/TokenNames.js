@@ -53,4 +53,12 @@ module.exports = class TokenNames {
   static get DAI_USDC() {
     return 'DAI_USDC';
   }
+
+  static get THREEMM() {
+    return 'THREEMM';
+  }
+
+  static get MUSD_THREEMM() {
+    return 'MUSD_THREEMM';
+  }
 };

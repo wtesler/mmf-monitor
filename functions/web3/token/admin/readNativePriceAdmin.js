@@ -8,6 +8,6 @@
   const response = await readNativePrice(TokenNames.MUSD_USDC, provider);
 
   console.log(response);
-  console.log(response.toString());
   console.log(response.toUnsafeFloat());
+  // console.log(1 / response.toUnsafeFloat());
 })();

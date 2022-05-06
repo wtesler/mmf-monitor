@@ -1,4 +1,4 @@
-module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, wallet) => {
+module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slippage, wallet) => {
   const {utils} = require("ethers");
   const FixedNumberUtils = require("../../../numbers/FixedNumberUtils");
   const ContractAddresses = require("../../../constants/ContractAddresses");
@@ -12,7 +12,6 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, wall
 
   const dstOutFixedNumber = FixedNumberUtils.AdjustToDecimals(srcToken, dstToken, srcBigNumber);
   const adjustedDstOutFixedNumber = FixedNumberUtils.Multiply(dstOutFixedNumber, nativePriceFixed);
-  const slippage = .999;
   const dstOutMinFixedNumber = FixedNumberUtils.Multiply(adjustedDstOutFixedNumber, slippage);
   const dstMinBigNumber = FixedNumberUtils.NumberToBigNumber(dstOutMinFixedNumber);
 
@@ -43,5 +42,5 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, wall
 
   await resilientTransact(async () => {
     return wallet.sendTransaction(tx);
-  }, 1);
+  }, 3);
 };

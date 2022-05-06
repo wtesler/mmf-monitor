@@ -43,6 +43,14 @@ module.exports = class TokenAddresses {
     return '0x787A47b0596fa8F7D6666F3C59696b3c57bB612b';
   }
 
+  static get THREEMM() {
+    return '0x74759c8bcb6787ef25ed2ff432fe33ed57cccb0d';
+  }
+
+  static get MUSD_THREEMM() {
+    return '0xdB04E53eC3FAB887Be2F55C3fD79bC57855bC827';
+  }
+
   static AreAddressesEqual(address1, address2) {
     return address1.toLowerCase() === address2.toLowerCase();
   }

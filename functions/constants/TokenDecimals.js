@@ -42,4 +42,12 @@ module.exports = class TokenDecimals {
   static get DAI_USDC() {
     return 18;
   }
+
+  static get THREEMM() {
+    return 18;
+  }
+
+  static get MUSD_THREEMM() {
+    return 18;
+  }
 };

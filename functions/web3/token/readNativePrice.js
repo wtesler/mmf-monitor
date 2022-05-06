@@ -7,6 +7,9 @@ module.exports = async (pairTokenName, provider) => {
 
   const response = await readLiquidity(pairTokenName, provider);
 
+  // console.log(response[tokenA].toString());
+  // console.log(response[tokenB].toString());
+
   response[tokenA] = FixedNumberUtils.AdjustToDecimals(tokenA, tokenB, response[tokenA]);
 
   return FixedNumberUtils.Divide(response[tokenB], response[tokenA]);

@@ -1,9 +1,11 @@
 module.exports = async () => {
   const firebaseAdmin = await require('../../firebase/firebaseAdmin');
+  const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
   const readTokenBalance = require('../../web3/token/readTokenBalance');
   const readNativePrice = require('../../web3/token/readNativePrice');
   const swapStable = require('../../web3/swap/liquidity/swapStable');
   const prepareWallet = require('../../web3/wallet/prepareWallet');
+  const dexScreenerClient = require('../../dexscreener/client/DexScreenerClient');
   const FixedNumberUtils = require('../../numbers/FixedNumberUtils');
   const TokenNames = require('../../constants/TokenNames');
 
@@ -18,7 +20,7 @@ module.exports = async () => {
   }
   const config = response.data();
 
-  const {email, mnemonic, pairToken, sellThreshold, buyThreshold} = config;
+  const {email, mnemonic, pairToken, sellThreshold, buyThreshold, slippage} = config;
 
   const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
@@ -30,9 +32,13 @@ module.exports = async () => {
     readTokenBalance(tokenB, wallet, false),
   ]);
 
+  // dexScreenerClient.readPairInfo(pairToken)
+  // const pair = pairInfo.pair;
+  // const priceNative = Number(pairInfo.priceNative);
+
   const priceNativeFloat = priceNativeFixedNumber.toUnsafeFloat();
 
-  console.log(`${ACTION} | PRICE: ${priceNativeFloat.toFixed(4)}`);
+  console.log(`${ACTION} | PRICE: ${priceNativeFloat.toFixed(6)}`);
 
   let srcToken;
   let dstToken;
@@ -54,7 +60,14 @@ module.exports = async () => {
 
   if (srcToken && !srcAmountBigNumber.isZero()) {
     console.log(`${ACTION} | ${decision}`);
-    await swapStable(srcToken, dstToken, srcAmountBigNumber, priceNativeFixedNumber, wallet);
+
+    // noinspection ES6MissingAwait
+    sendInBlueClient.sendEmail(email, 10, {
+      decision: decision,
+      price: priceNativeFloat.toFixed(6)
+    });
+
+    await swapStable(srcToken, dstToken, srcAmountBigNumber, priceNativeFixedNumber, slippage, wallet);
   }
 
   console.log(`${ACTION} | SUCCESS`);
