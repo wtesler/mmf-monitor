@@ -1,4 +1,4 @@
-module.exports = async (tokenName, wallet) => {
+module.exports = async (tokenName, wallet, tryAgainIfZero=true) => {
   const TokenNames = require("../../constants/TokenNames");
 
   let balanceBigNumber;
@@ -6,7 +6,7 @@ module.exports = async (tokenName, wallet) => {
     balanceBigNumber = await wallet.provider.getBalance(wallet.address);
   } else {
     balanceBigNumber = await readErc20Balance(tokenName, wallet);
-    if (balanceBigNumber.isZero()) {
+    if (balanceBigNumber.isZero() && tryAgainIfZero) {
       console.warn('Balance was zero so trying again.');
       // Try again if balance was zero just in case it needed time to update.
       await new Promise(resolve => setTimeout(resolve, 5000)); // Sleep

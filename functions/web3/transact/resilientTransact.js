@@ -2,14 +2,13 @@
  * Try the transaction a few times with a pause in-between.
  *
  * @param transactionAction An function which returns a pending transaction.
+ * @param attempts Number of attempts before throwing error.
  */
-module.exports = async (transactionAction) => {
-  const TOTAL_ATTEMPTS = 6;
-
+module.exports = async (transactionAction, attempts=6) => {
   let numAttempts = 0;
   let error;
 
-  while (numAttempts < TOTAL_ATTEMPTS) {
+  while (numAttempts < attempts) {
     try {
       // const timeoutPromise = new Promise(resolve => setTimeout(resolve, 120000, 'timeout')); // 2 minutes.
 
@@ -38,7 +37,7 @@ module.exports = async (transactionAction) => {
     } catch (e) {
       error = e;
       numAttempts++;
-      if (numAttempts < TOTAL_ATTEMPTS) {
+      if (numAttempts < attempts) {
         console.log(`TRANSACTION FAILED. TRYING AGAIN AFTER PAUSE.`);
         if (e.code === 'CALL_EXCEPTION') {
           console.log(e.reason);

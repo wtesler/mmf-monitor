@@ -5,7 +5,7 @@
 
   const provider = prepareProvider();
 
-  const response = await readNativePrice(TokenNames.MMF_MUSD, provider);
+  const response = await readNativePrice(TokenNames.MUSD_USDC, provider);
 
   console.log(response);
   console.log(response.toString());

@@ -14,5 +14,4 @@ module.exports = class StakeContractPids {
   static get MMF_MUSD() {
     return 34;
   }
-
 };

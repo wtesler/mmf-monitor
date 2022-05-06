@@ -9,7 +9,7 @@ module.exports = async (srcToken, dstToken, srcBigNumber, wallet) => {
   console.log(`${ACTION} | TOKENS: ${srcToken} -> ${dstToken}`);
 
   if (srcBigNumber.isZero()) {
-    console.warn("NO NEED TO SWAP BECAUSE SRC IN AMOUNT WAS ZERO");
+    console.warn("NO NEED TO SWAP BECAUSE SRC AMOUNT WAS ZERO");
     return null;
   }
 
