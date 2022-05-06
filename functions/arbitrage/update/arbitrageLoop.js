@@ -40,7 +40,9 @@ module.exports = async () => {
           readTokenBalance(tokenB, wallet, false),
         ]);
         tokenABalanceBigNumber = balances[0];
-        tokenABalanceBigNumber = balances[1];
+        tokenBBalanceBigNumber = balances[1];
+        console.log(`${tokenA} BALANCE: ${tokenABalanceBigNumber.toString()}`);
+        console.log(`${tokenB} BALANCE: ${tokenBBalanceBigNumber.toString()}`);
         doesNeedToFetchTokenBalances = false;
       }
 
@@ -82,6 +84,8 @@ module.exports = async () => {
         });
 
         await swapStable(srcToken, dstToken, srcAmountBigNumber, priceNativeFixedNumber, slippage, wallet);
+
+        await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep / Settle
 
         doesNeedToFetchTokenBalances = true;
       }

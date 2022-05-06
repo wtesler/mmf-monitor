@@ -23,10 +23,10 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
   const dataRow4 = utils.hexZeroPad(srcBigNumber.toHexString(), 32).replace('0x', '');
   const dataRow5 = utils.hexZeroPad(dstMinBigNumber.toHexString(), 32).replace('0x', '');
 
-  console.log(dataRow2);
-  console.log(dataRow3);
-  console.log(dataRow4);
-  console.log(dataRow5);
+  // console.log(dataRow2);
+  // console.log(dataRow3);
+  // console.log(dataRow4);
+  // console.log(dataRow5);
 
   const data = dataRow1 + dataRow2 + dataRow3 + dataRow4 + dataRow5;
 
