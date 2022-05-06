@@ -91,6 +91,8 @@ module.exports = async () => {
       }
     } catch (e) {
       console.error(e);
+      doesNeedToFetchTokenBalances = true;
+      lastPriceStr = null;
     }
   }
 };
