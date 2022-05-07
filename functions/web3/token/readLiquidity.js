@@ -11,10 +11,24 @@ module.exports = async (pairTokenName, provider) => {
 
   const contract = new ethers.Contract(tokenAddress, pairAbi, provider);
 
-  const [quoteAddress, reserves] = await Promise.all([
-    contract.token0(),
-    contract.getReserves()
-  ]);
+  let quoteAddress;
+  let reserves;
+
+  const readInfo = async() => {
+    [quoteAddress, reserves] = await Promise.all([
+      contract.token0(),
+      contract.getReserves()
+    ]);
+  };
+
+  try {
+    await readInfo();
+  } catch (e) {
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Sleep
+    // Try a second time for good luck (and resilience).
+    await readInfo();
+  }
+
 
   const quoteReserve = reserves[0];
   const baseReserve = reserves[1];

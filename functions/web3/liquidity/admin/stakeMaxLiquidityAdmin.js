@@ -4,7 +4,7 @@
   const TokenNames = require("../../../constants/TokenNames");
   const readDefiMnemonic = require('../../../secrets/specific/readDefiMnemonic');
 
-  const mnemonic = await readDefiMnemonic();
+  const mnemonic = await readDefiMnemonic(2);
 
   const wallet = await prepareWallet(mnemonic);
 

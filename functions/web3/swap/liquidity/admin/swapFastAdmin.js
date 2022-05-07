@@ -1,5 +1,5 @@
 (async () => {
-  const swapStable = require("../swapStable");
+  const swapFast = require("../swapFast");
   const prepareWallet = require("../../../wallet/prepareWallet");
   const readTokenBalance = require("../../../token/readTokenBalance");
   const TokenNames = require("../../../../constants/TokenNames");
@@ -18,19 +18,19 @@
 
   let priceNativeFixedNumber = await readNativePrice(pairToken, wallet);
 
-  const SRC_TOKEN = TokenNames.USDC;
-  const DST_TOKEN = TokenNames.MUSD;
+  const SRC_TOKEN = TokenNames.MUSD;
+  const DST_TOKEN = TokenNames.USDC;
 
   if (SRC_TOKEN !== tokenA) {
     priceNativeFixedNumber = FixedNumberUtils.Divide(1, priceNativeFixedNumber);
   }
 
-  // const amount = 4.99;
+  // const amount = 5;
   // const srcBigNumber = utils.parseUnits(amount.toString(), TokenDecimals[SRC_TOKEN]);
   // const srcBigNumber = BigNumber.from('36705028177096034348');
   const srcBigNumber = await readTokenBalance(SRC_TOKEN, wallet);
 
-  await swapStable(
+  await swapFast(
     SRC_TOKEN,
     DST_TOKEN,
     srcBigNumber,

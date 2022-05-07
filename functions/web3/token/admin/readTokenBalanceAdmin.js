@@ -4,11 +4,11 @@
   const TokenNames = require("../../../constants/TokenNames");
   const readDefiMnemonic = require('../../../secrets/specific/readDefiMnemonic');
 
-  const mnemonic = await readDefiMnemonic();
+  const mnemonic = await readDefiMnemonic(2);
 
   const wallet = await prepareWallet(mnemonic);
 
-  const balance = await readTokenBalance(TokenNames.MMF, wallet);
+  const balance = await readTokenBalance(TokenNames.MUSD, wallet);
 
   console.log(balance);
   console.log(balance.toString());

@@ -1,4 +1,4 @@
-module.exports = async (srcToken, dstToken, srcBigNumber, wallet) => {
+module.exports = async (srcToken, dstToken, srcBigNumber, wallet, slippage=.995) => {
   const swapTokens = require('../swapTokens');
   const readNativePrice = require('../../token/readNativePrice');
   const TokenAddresses = require("../../../constants/TokenAddresses");
@@ -38,7 +38,6 @@ module.exports = async (srcToken, dstToken, srcBigNumber, wallet) => {
 
     // console.log(`ADJUSTED DST OUT FIXED NUMBER: ${adjustedDstOutFixedNumber}`);
 
-    const slippage = .995;
     const dstOutMinFixedNumber = FixedNumberUtils.Multiply(adjustedDstOutFixedNumber, slippage);
 
     // console.log(`DST OUT MIN FIXED NUMBER: ${dstOutMinFixedNumber}`);

@@ -21,6 +21,7 @@
     "padded-blocks": "off",
     "camelcase": "off",
     "new-cap": "off",
+    "no-constant-condition": "off",
 
     // Removed rule "disallow the use of console" from recommended eslint rules
     "no-console": "off",

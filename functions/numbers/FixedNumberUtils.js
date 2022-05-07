@@ -24,6 +24,13 @@ module.exports = class TokenAddresses {
     return fixedNumberA.divUnsafe(fixedNumberB);
   }
 
+  static From(someNumber) {
+    const {FixedNumber} = require('ethers');
+
+    const numString = this._FullNumberString(someNumber);
+    return FixedNumber.fromString(numString, this._FixedFormat);
+  }
+
   static AdjustToDecimals(tokenA, tokenB, someNumberOfTokenA) {
     const {FixedNumber} = require('ethers');
     const TokenDecimals = require('../constants/TokenDecimals');
