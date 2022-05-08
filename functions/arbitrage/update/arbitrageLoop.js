@@ -1,5 +1,5 @@
 module.exports = async () => {
-  const firebaseAdmin = await require('../../firebase/firebaseAdmin');
+  const readArbitrageConfig = await require('../read/readArbitrageConfig');
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const arbitrageLoopBody = require('./arbitrageLoopBody');
 
@@ -7,32 +7,37 @@ module.exports = async () => {
 
   console.log(`${ACTION} | STARTED`);
 
-  const firestore = firebaseAdmin.firestore();
-  const response = await firestore.doc(`arbitrage/config`).get();
-  if (!response.exists) {
-    throw new Error('No arbitrage config found.');
-  }
-  const config = response.data();
+  let config;
+  let configReadTimeMs = -1;
+  let wallet;
 
-  const {mnemonic} = config;
+  const refreshConfig = async() => {
+    config = await readArbitrageConfig();
+    configReadTimeMs = Date.now();
+    const {mnemonic} = config;
+    wallet = await prepareWallet(mnemonic);
+  };
 
-  const wallet = await prepareWallet(mnemonic);
-
-  const mutexObj = {
+  const sharedObj = {
     tokenABalanceBigNumber: null,
     tokenBBalanceBigNumber: null,
     doesNeedToFetchTokenBalances: true,
     isFetchingTokenBalances: false,
     lastPriceStr: null,
     isSwapping: false,
-    numBodies: 0
+    didJustSuccessfullySwap: false,
+    numBodies: 0,
   };
 
   // noinspection InfiniteLoopJS
   while (true) {
-    // noinspection ES6MissingAwait
-    if (mutexObj.numBodies < 3) {
-      arbitrageLoopBody(config, mutexObj, wallet);
+    if (Date.now() - configReadTimeMs > 600000) { // Every 10 minutes.
+      await refreshConfig();
+    }
+
+    if (sharedObj.numBodies < 3) {
+      // noinspection ES6MissingAwait
+      arbitrageLoopBody(config, sharedObj, wallet);
     } else {
       // console.warn("Skipping because too many simultaneous requests.");
     }

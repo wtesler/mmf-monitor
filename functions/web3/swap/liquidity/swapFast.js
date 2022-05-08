@@ -18,7 +18,7 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
   const dstOutMinFixedNumber = FixedNumberUtils.Multiply(adjustedDstOutFixedNumber, slippage);
   const dstMinBigNumber = FixedNumberUtils.NumberToBigNumber(dstOutMinFixedNumber);
 
-  const deadline = BigNumber.from((Date.now() + 1000 * 60 * 2).toString());
+  const deadline = BigNumber.from((Date.now() + 1000 * 60 * 2).toString()).toHexString();
 
   const toPaddedString = (hexString) => {
     return utils.hexZeroPad(hexString, 32).replace('0x', '');
@@ -30,7 +30,7 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
     toPaddedString(dstMinBigNumber.toHexString()), // dst amount min
     `00000000000000000000000000000000000000000000000000000000000000a0`, // WTF is this. (160 in decimal)
     toPaddedString(wallet.address), // our own address
-    toPaddedString(deadline.toHexString()), // deadline
+    toPaddedString(deadline), // deadline
     `0000000000000000000000000000000000000000000000000000000000000002`, // Number of hops?
     toPaddedString(TokenAddresses[srcToken]), // src internal transaction
     toPaddedString(TokenAddresses[dstToken]), // dst internal transaction

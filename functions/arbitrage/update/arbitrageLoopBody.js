@@ -1,57 +1,94 @@
-module.exports = async (config, mutexObj, wallet) => {
+/**
+ * Checks if the conditions are necessary to issue a buy/sell swap and make the swap if necessary.
+ *
+ * @param config The arbitrage config pulled from the database.
+ * @param sharedObj You can see fields of this object in `arbitrageLoop`. They are values shared across body calls.
+ * @param wallet
+ */
+module.exports = async (config, sharedObj, wallet) => {
   const sendInBlueClient = await require('../../sendinblue/client/SendInBlueClient');
   const readTokenBalance = require('../../web3/token/readTokenBalance');
   const readNativePrice = require('../../web3/token/readNativePrice');
   const swapFast = require('../../web3/swap/liquidity/swapFast');
   const FixedNumberUtils = require('../../numbers/FixedNumberUtils');
   const TokenNames = require('../../constants/TokenNames');
+  const TokenDecimals = require('../../constants/TokenDecimals');
+  const {BigNumber, FixedNumber} = require('ethers');
 
   const ACTION = `ARBITRAGE`;
 
-  if (mutexObj.isSwapping) {
+  if (sharedObj.isSwapping) {
     return;
   }
 
-  if (mutexObj.isFetchingTokenBalances) {
+  if (sharedObj.isFetchingTokenBalances) {
     return;
   }
 
-  mutexObj.numBodies += 1;
+  sharedObj.numBodies += 1;
 
   let localIsFetchingTokenBalances = false;
   let localIsSwapping = false;
 
   try {
-    const {email, pairToken, sellThreshold, buyThreshold, slippage} = config;
+    const {email, pairToken, sellThreshold, buyThreshold, slippage, maxSrcNumber} = config;
 
     const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
-    if (mutexObj.doesNeedToFetchTokenBalances) {
+    // Adjust maxSrcNumber from config to the respective decimal places.
+    const tokenADecimalsMult = BigNumber.from(10).pow(TokenDecimals[tokenA]);
+    const tokenBDecimalsMult = BigNumber.from(10).pow(TokenDecimals[tokenB]);
+    let maxSrcAmountBigNumberA = BigNumber.from(maxSrcNumber).mul(tokenADecimalsMult);
+    let maxSrcAmountBigNumberB = BigNumber.from(maxSrcNumber).mul(tokenBDecimalsMult);
+
+    if (sharedObj.doesNeedToFetchTokenBalances) {
       localIsFetchingTokenBalances = true;
-      mutexObj.isFetchingTokenBalances = true;
+      sharedObj.isFetchingTokenBalances = true;
+
       const balances = await Promise.all([
         readTokenBalance(tokenA, wallet, false),
         readTokenBalance(tokenB, wallet, false),
       ]);
+
+      sharedObj.tokenABalanceBigNumber = balances[0];
+      sharedObj.tokenBBalanceBigNumber = balances[1];
+
+      const tokenABalanceStr = sharedObj.tokenABalanceBigNumber.toString();
+      const tokenBBalanceStr = sharedObj.tokenBBalanceBigNumber.toString();
+
+      console.log(`${tokenA} BALANCE: ${tokenABalanceStr}`);
+      console.log(`${tokenB} BALANCE: ${tokenBBalanceStr}`);
+
+      if (sharedObj.didJustSuccessfullySwap) {
+        sharedObj.didJustSuccessfullySwap = false;
+
+        const adjustedTokenAFixed = FixedNumberUtils.From(sharedObj.tokenABalanceBigNumber).Divide(BigNumber.from(10).pow(TokenDecimals[tokenA]));
+        const adjustedTokenBFixed = FixedNumberUtils.From(sharedObj.tokenBBalanceBigNumber).Divide(BigNumber.from(10).pow(TokenDecimals[tokenB]));
+        const totalBalanceUsd = adjustedTokenAFixed.addUnsafe(adjustedTokenBFixed);
+
+        // noinspection ES6MissingAwait
+        sendInBlueClient.sendEmail(email, 11, {
+          tokenA: tokenA,
+          tokenB: tokenB,
+          tokenABalance: tokenABalanceStr,
+          tokenBBalance: tokenBBalanceStr,
+          totalBalanceUsd: totalBalanceUsd,
+        });
+      }
+
       localIsFetchingTokenBalances = false;
-      mutexObj.isFetchingTokenBalances = false;
-      mutexObj.doesNeedToFetchTokenBalances = false;
-
-      mutexObj.tokenABalanceBigNumber = balances[0];
-      mutexObj.tokenBBalanceBigNumber = balances[1];
-
-      console.log(`${tokenA} BALANCE: ${mutexObj.tokenABalanceBigNumber.toString()}`);
-      console.log(`${tokenB} BALANCE: ${mutexObj.tokenBBalanceBigNumber.toString()}`);
+      sharedObj.isFetchingTokenBalances = false;
+      sharedObj.doesNeedToFetchTokenBalances = false;
     }
 
-    let priceNativeFixedNumber = await readNativePrice(pairToken, wallet);
+    const priceNativeFixedNumber = await readNativePrice(pairToken, wallet);
 
     const priceNativeFloat = priceNativeFixedNumber.toUnsafeFloat();
     const priceStr = priceNativeFloat.toFixed(6);
 
-    if (priceStr !== mutexObj.lastPriceStr) {
+    if (priceStr !== sharedObj.lastPriceStr) {
       console.log(`${ACTION} | PRICE: ${priceStr}`);
-      mutexObj.lastPriceStr = priceStr;
+      sharedObj.lastPriceStr = priceStr;
     }
 
     let srcToken;
@@ -61,23 +98,49 @@ module.exports = async (config, mutexObj, wallet) => {
 
     let dstPriceFixedNumber;
 
+    const adjustMaxSrcAmountToThresholdDiff = (priceFloat, threshold, maxSrcAmountBigNumber) => {
+      const maxSrcAmountFixed = FixedNumberUtils.From(maxSrcAmountBigNumber);
+      const thresholdPriceDiff = Math.abs(priceFloat - threshold);
+      const thresholdPriceDiffMult = Math.max(thresholdPriceDiff * 1000, 1);
+      const adjustedMaxSrcAmountFixed = FixedNumberUtils.Multiply(maxSrcAmountFixed, thresholdPriceDiffMult);
+      const adjustedMaxSrcAmountBigNumber = FixedNumberUtils.NumberToBigNumber(adjustedMaxSrcAmountFixed);
+      return adjustedMaxSrcAmountBigNumber;
+    };
+
+    let srcAmountBigNumberA = sharedObj.tokenABalanceBigNumber;
+    let srcAmountBigNumberB = sharedObj.tokenBBalanceBigNumber;
+
     if (priceNativeFloat > sellThreshold) {
       srcToken = tokenA;
       dstToken = tokenB;
-      srcAmountBigNumber = mutexObj.tokenABalanceBigNumber;
+
+      maxSrcAmountBigNumberA = adjustMaxSrcAmountToThresholdDiff(priceNativeFloat, sellThreshold, maxSrcAmountBigNumberA);
+
+      if (srcAmountBigNumberA.gt(maxSrcAmountBigNumberA)) {
+        srcAmountBigNumberA = maxSrcAmountBigNumberA;
+      }
+
+      srcAmountBigNumber = srcAmountBigNumberA;
       dstPriceFixedNumber = FixedNumberUtils.From(sellThreshold);
       decision = 'SELL';
     } else if (priceNativeFloat < buyThreshold) {
       srcToken = tokenB;
       dstToken = tokenA;
-      srcAmountBigNumber = mutexObj.tokenBBalanceBigNumber;
+
+      maxSrcAmountBigNumberB = adjustMaxSrcAmountToThresholdDiff(priceNativeFloat, buyThreshold, maxSrcAmountBigNumberB);
+
+      if (srcAmountBigNumberB.gt(maxSrcAmountBigNumberB)) {
+        srcAmountBigNumberB = maxSrcAmountBigNumberB;
+      }
+
+      srcAmountBigNumber = srcAmountBigNumberB;
       dstPriceFixedNumber = FixedNumberUtils.From(buyThreshold);
       dstPriceFixedNumber = FixedNumberUtils.Divide(1, dstPriceFixedNumber);
       decision = 'BUY';
     }
 
-    if (srcToken && !srcAmountBigNumber.isZero() && !mutexObj.isSwapping) {
-      mutexObj.isSwapping = true;
+    if (srcToken && !srcAmountBigNumber.isZero() && !sharedObj.isSwapping) {
+      sharedObj.isSwapping = true;
       localIsSwapping = true;
 
       console.log(`${ACTION} | ${decision}`);
@@ -90,27 +153,27 @@ module.exports = async (config, mutexObj, wallet) => {
 
       await swapFast(srcToken, dstToken, srcAmountBigNumber, dstPriceFixedNumber, slippage, wallet);
 
-      mutexObj.isSwapping = false;
+      sharedObj.didJustSuccessfullySwap = true;
+      sharedObj.isSwapping = false;
       localIsSwapping = false;
 
-      // await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep / Settle
-
-      mutexObj.doesNeedToFetchTokenBalances = true;
+      sharedObj.doesNeedToFetchTokenBalances = true;
     }
   } catch (e) {
-    if (e.toString().includes('502 Bad Gateway')) {
+    const errStr = e.toString();
+    if (errStr.includes('502 Bad Gateway') || errStr.includes('504 Bad Gateway')) {
       console.warn('Bad Gateway.');
     } else {
       console.error(e);
     }
     if (localIsFetchingTokenBalances) {
-      mutexObj.isFetchingTokenBalances = false;
+      sharedObj.isFetchingTokenBalances = false;
     }
     if (localIsSwapping) {
-      mutexObj.isSwapping = false;
+      sharedObj.isSwapping = false;
     }
-    mutexObj.doesNeedToFetchTokenBalances = true;
+    sharedObj.doesNeedToFetchTokenBalances = true;
   } finally {
-    mutexObj.numBodies -= 1;
+    sharedObj.numBodies -= 1;
   }
 };
