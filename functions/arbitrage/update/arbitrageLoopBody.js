@@ -31,7 +31,7 @@ module.exports = async (config, sharedObj, wallet) => {
   let localIsSwapping = false;
 
   try {
-    const {email, pairToken, sellThreshold, buyThreshold, slippage, maxSrcNumber} = config;
+    const {email, pairToken, sellThreshold, buyThreshold, slippage, crossoverMult, maxSrcNumber} = config;
 
     const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
@@ -62,8 +62,10 @@ module.exports = async (config, sharedObj, wallet) => {
       if (sharedObj.didJustSuccessfullySwap) {
         sharedObj.didJustSuccessfullySwap = false;
 
-        const adjustedTokenAFixed = FixedNumberUtils.From(sharedObj.tokenABalanceBigNumber).Divide(BigNumber.from(10).pow(TokenDecimals[tokenA]));
-        const adjustedTokenBFixed = FixedNumberUtils.From(sharedObj.tokenBBalanceBigNumber).Divide(BigNumber.from(10).pow(TokenDecimals[tokenB]));
+        const tokenABalanceFixed = FixedNumberUtils.From(sharedObj.tokenABalanceBigNumber);
+        const tokenBBalanceFixed = FixedNumberUtils.From(sharedObj.tokenBBalanceBigNumber);
+        const adjustedTokenAFixed = FixedNumberUtils.Divide(tokenABalanceFixed, BigNumber.from(10).pow(TokenDecimals[tokenA]));
+        const adjustedTokenBFixed = FixedNumberUtils.Divide(tokenBBalanceFixed, BigNumber.from(10).pow(TokenDecimals[tokenB]));
         const totalBalanceUsd = adjustedTokenAFixed.addUnsafe(adjustedTokenBFixed);
 
         // noinspection ES6MissingAwait
@@ -101,7 +103,7 @@ module.exports = async (config, sharedObj, wallet) => {
     const adjustMaxSrcAmountToThresholdDiff = (priceFloat, threshold, maxSrcAmountBigNumber) => {
       const maxSrcAmountFixed = FixedNumberUtils.From(maxSrcAmountBigNumber);
       const thresholdPriceDiff = Math.abs(priceFloat - threshold);
-      const thresholdPriceDiffMult = Math.max(thresholdPriceDiff * 1000, 1);
+      const thresholdPriceDiffMult = Math.max(thresholdPriceDiff * crossoverMult, 1);
       const adjustedMaxSrcAmountFixed = FixedNumberUtils.Multiply(maxSrcAmountFixed, thresholdPriceDiffMult);
       const adjustedMaxSrcAmountBigNumber = FixedNumberUtils.NumberToBigNumber(adjustedMaxSrcAmountFixed);
       return adjustedMaxSrcAmountBigNumber;
@@ -140,24 +142,26 @@ module.exports = async (config, sharedObj, wallet) => {
     }
 
     if (srcToken && !srcAmountBigNumber.isZero() && !sharedObj.isSwapping) {
-      sharedObj.isSwapping = true;
-      localIsSwapping = true;
+      await sharedObj.swapMutex.runExclusive(async () => {
+        sharedObj.isSwapping = true;
+        localIsSwapping = true;
 
-      console.log(`${ACTION} | ${decision}`);
+        console.log(`${ACTION} | ${decision}`);
 
-      // noinspection ES6MissingAwait
-      sendInBlueClient.sendEmail(email, 10, {
-        decision: decision,
-        price: priceStr
+        // noinspection ES6MissingAwait
+        sendInBlueClient.sendEmail(email, 10, {
+          decision: decision,
+          price: priceStr
+        });
+
+        await swapFast(srcToken, dstToken, srcAmountBigNumber, dstPriceFixedNumber, slippage, wallet);
+
+        sharedObj.didJustSuccessfullySwap = true;
+        sharedObj.isSwapping = false;
+        localIsSwapping = false;
+
+        sharedObj.doesNeedToFetchTokenBalances = true;
       });
-
-      await swapFast(srcToken, dstToken, srcAmountBigNumber, dstPriceFixedNumber, slippage, wallet);
-
-      sharedObj.didJustSuccessfullySwap = true;
-      sharedObj.isSwapping = false;
-      localIsSwapping = false;
-
-      sharedObj.doesNeedToFetchTokenBalances = true;
     }
   } catch (e) {
     const errStr = e.toString();

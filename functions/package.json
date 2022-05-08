@@ -15,6 +15,7 @@
   },
   "main": "index.js",
   "dependencies": {
+    "async-mutex": "0.3.2",
     "cors": "2.8.5",
     "cranny": "2.1.4",
     "ethers": "5.6.4",

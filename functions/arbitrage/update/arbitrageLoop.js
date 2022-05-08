@@ -1,5 +1,6 @@
 module.exports = async () => {
   const readArbitrageConfig = await require('../read/readArbitrageConfig');
+  const {Mutex} = await require('async-mutex');
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const arbitrageLoopBody = require('./arbitrageLoopBody');
 
@@ -25,6 +26,7 @@ module.exports = async () => {
     isFetchingTokenBalances: false,
     lastPriceStr: null,
     isSwapping: false,
+    swapMutex: new Mutex(),
     didJustSuccessfullySwap: false,
     numBodies: 0,
   };
@@ -36,11 +38,10 @@ module.exports = async () => {
     }
 
     if (sharedObj.numBodies < 3) {
-      // noinspection ES6MissingAwait
-      arbitrageLoopBody(config, sharedObj, wallet);
+      await arbitrageLoopBody(config, sharedObj, wallet);
     } else {
       // console.warn("Skipping because too many simultaneous requests.");
     }
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Sleep
+    // await new Promise(resolve => setTimeout(resolve, 1000)); // Sleep
   }
 };
