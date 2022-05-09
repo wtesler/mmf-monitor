@@ -34,6 +34,10 @@ module.exports = class TokenNames {
     return 'SVN';
   }
 
+  static get DUSD() {
+    return 'DUSD';
+  }
+
   static get MMF_USDC() {
     return 'MMF_USDC';
   }
@@ -44,6 +48,10 @@ module.exports = class TokenNames {
 
   static get MUSD_USDC() {
     return 'MUSD_USDC';
+  }
+
+  static get DUSD_USDC() {
+    return 'DUSD_USDC';
   }
 
   static get USDC_USDT() {

@@ -9,7 +9,8 @@ module.exports = async (srcToken, dstToken, srcAmount, dstPriceFixed, slippage, 
     if (errStr.includes('Bad Gateway')) {
       console.warn('Bad Gateway.');
     } else {
-      console.warn(`${e.code}: ${e.reason}`);
+      console.log(e);
+      // console.warn(`${e.code}: ${e.reason}`);
     }
     onSwapResult(null, e);
   }

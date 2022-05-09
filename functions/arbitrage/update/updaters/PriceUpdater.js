@@ -20,7 +20,13 @@ module.exports = class PriceUpdater {
   }
 
   start() {
+    // noinspection JSIgnoredPromiseFromCall
     this._startUpdating();
+  }
+
+  stop() {
+    this.shouldUpdate = false;
+    this._clear();
   }
 
   observe() {
@@ -30,11 +36,6 @@ module.exports = class PriceUpdater {
   _clear() {
     this.price = null;
     this.priceSubject.next(null);
-  }
-
-  stop() {
-    this.shouldUpdate = false;
-    this._clear();
   }
 
   async _startUpdating() {
@@ -58,7 +59,7 @@ module.exports = class PriceUpdater {
       const priceNativeFixedNumber = await readNativePrice(this.pairToken, this.wallet.provider);
       const priceNativeFloat = priceNativeFixedNumber.toUnsafeFloat();
       if (priceNativeFloat !== this.price) {
-        console.log(`PRICE: ${priceNativeFloat.toFixed(6)}`);
+        console.log(`${this.pairToken} PRICE: ${priceNativeFloat.toFixed(6)}`);
       }
       this.price = priceNativeFloat;
       this.priceSubject.next(this.price);

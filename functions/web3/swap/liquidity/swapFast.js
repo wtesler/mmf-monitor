@@ -11,6 +11,8 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
 
   const ACTION = `SWAP FAST`;
 
+  console.log(`${ACTION} | NONCE: ${nonce}`);
+
   console.log(`${ACTION} | TOKENS: ${srcToken} -> ${dstToken}`);
 
   const dstOutFixedNumber = FixedNumberUtils.AdjustToDecimals(srcToken, dstToken, srcBigNumber);

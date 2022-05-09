@@ -1,5 +1,5 @@
 module.exports = async () => {
-  const readArbitrageConfig = await require('../read/readArbitrageConfig');
+  const readArbitrageConfigs = await require('../read/readArbitrageConfigs');
   const prepareWallet = require('../../web3/wallet/prepareWallet');
   const considerSwap = require('./considerSwap');
   const PriceUpdater = require('./updaters/PriceUpdater');
@@ -12,59 +12,29 @@ module.exports = async () => {
 
   console.log(`${ACTION} | STARTED`);
 
-  const priceUpdater = new PriceUpdater();
-  const balanceUpdater = new BalanceUpdater();
+  let subscription = new Subscription();
 
-  const subscription = new Subscription();
+  let configs = {};
 
-  let configReadTimeMs = -1;
-  let wallet;
-
-  let config;
-  let nonce;
-
-  const readConfig = async () => {
-    config = await readArbitrageConfig();
-    configReadTimeMs = Date.now();
-    const {pairToken, mnemonic, updatePeriodMs} = config;
-    wallet = await prepareWallet(mnemonic);
-    nonce = await readCurrentNonce(wallet);
-    priceUpdater.setConfig(pairToken, wallet, updatePeriodMs);
-    balanceUpdater.setConfig(pairToken, wallet);
+  const onSwapResult = async (result, err, config) => {
+    config.nonce = await readCurrentNonce(config.wallet);
+    config.isSwapping = false;
+    config.needsBalanceUpdate = true;
   };
 
-  await readConfig();
-
-  // Refresh config every 10 minutes in case it changed on the backend.
-  subscription.add(
-    interval(600000).subscribe(() => {
-      readConfig();
-    })
-  );
-
-  priceUpdater.start();
-
-  let isSwapping = false;
-  let isUpdatingBalance = false;
-  let needsBalanceUpdate = true;
-
-  const onSwapResult = async(result, err) => {
-    nonce = await readCurrentNonce(wallet);
-    isSwapping = false;
-    needsBalanceUpdate = true;
-  };
-
-  const onUpdate = async ([priceFloat, [balanceA, balanceB]]) => {
-    if (isUpdatingBalance) {
+  const onUpdate = async ([priceFloat, [balanceA, balanceB]], config) => {
+    if (config.isUpdatingBalance) {
       return;
     }
 
-    if (needsBalanceUpdate) {
-      isUpdatingBalance = true;
+    const {balanceUpdater, wallet, nonce} = config;
+
+    if (config.needsBalanceUpdate) {
+      config.isUpdatingBalance = true;
       await balanceUpdater.update((didUpdate) => {
-        isUpdatingBalance = false;
+        config.isUpdatingBalance = false;
         if (didUpdate) {
-          needsBalanceUpdate = false;
+          config.needsBalanceUpdate = false;
         }
       });
       return;
@@ -74,18 +44,57 @@ module.exports = async () => {
       return;
     }
 
-    if (isSwapping) {
+    if (config.isSwapping) {
       return;
     }
 
-    isSwapping = considerSwap(priceFloat, balanceA, balanceB, wallet, config, onSwapResult, nonce, sendInBlueClient);
+    const configOnSwapResult = (result,error) => onSwapResult(result, error, config);
+
+    config.isSwapping = considerSwap(priceFloat, balanceA, balanceB, wallet, config, configOnSwapResult, nonce, sendInBlueClient);
   };
 
+  const readConfigs = async () => {
+    subscription.unsubscribe();
+    subscription = new Subscription();
+
+    for (const pairToken of Object.keys(configs)) {
+      if (configs[pairToken].priceUpdater) {
+        configs[pairToken].priceUpdater.stop();
+      }
+    }
+
+    configs = await readArbitrageConfigs();
+
+    for (const config of configs) {
+      const {pairToken, mnemonic, updatePeriodMs} = config;
+      config.wallet = await prepareWallet(mnemonic);
+      config.nonce = await readCurrentNonce(config.wallet);
+      config.priceUpdater = new PriceUpdater();
+      config.balanceUpdater = new BalanceUpdater();
+
+      config.priceUpdater.setConfig(pairToken, config.wallet, updatePeriodMs);
+      config.balanceUpdater.setConfig(pairToken, config.wallet);
+
+      subscription.add(
+        combineLatest(
+          config.priceUpdater.observe(),
+          config.balanceUpdater.observe().pipe(distinctUntilChanged())
+        )
+          .subscribe(x => {
+            onUpdate(x, config)
+          })
+      );
+
+      config.priceUpdater.start();
+    }
+  };
+
+  await readConfigs();
+
+  // Refresh config every 10 minutes in case it changed on the backend.
   subscription.add(
-    combineLatest(
-      priceUpdater.observe(),
-      balanceUpdater.observe().pipe(distinctUntilChanged())
-    )
-      .subscribe(onUpdate)
+    interval(300000).subscribe(() => {
+      readConfigs();
+    })
   );
 };
