@@ -2,7 +2,7 @@
  * A faster alternative to `swapBasic` where we manually set gas prices and avoid `populateTransaction` call.
  * More rigid and likely to fail in some scenarios.
  */
-module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slippage, wallet) => {
+module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slippage, nonce, wallet) => {
   const {utils, BigNumber} = require("ethers");
   const FixedNumberUtils = require("../../../numbers/FixedNumberUtils");
   const ContractAddresses = require("../../../constants/ContractAddresses");
@@ -40,8 +40,6 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
 
   const gasPriceWei = 7000000000000;
   const gasLimit = 300000;
-
-  const nonce = await wallet.provider.getTransactionCount(wallet.address, "latest");
 
   const tx = {
     from: wallet.address,

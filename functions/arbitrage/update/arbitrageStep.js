@@ -20,7 +20,7 @@ module.exports = async () => {
   }
   const config = response.data();
 
-  const {email, mnemonic, pairToken, sellThreshold, buyThreshold, slippage} = config;
+  const {email, mnemonic, pairToken, sellThreshold, buyThreshold, baseSlippage} = config;
 
   const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
@@ -67,7 +67,7 @@ module.exports = async () => {
       price: priceNativeFloat.toFixed(6)
     });
 
-    await swapStable(srcToken, dstToken, srcAmountBigNumber, priceNativeFixedNumber, slippage, wallet);
+    await swapStable(srcToken, dstToken, srcAmountBigNumber, priceNativeFixedNumber, baseSlippage, wallet);
   }
 
   console.log(`${ACTION} | SUCCESS`);

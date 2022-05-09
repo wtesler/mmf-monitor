@@ -1,4 +1,6 @@
 /**
+ * @deprecated Not in use.
+ *
  * Checks if the conditions are necessary to issue a buy/sell swap and make the swap if necessary.
  *
  * @param config The arbitrage config pulled from the database.
@@ -13,7 +15,7 @@ module.exports = async (config, sharedObj, wallet) => {
   const FixedNumberUtils = require('../../numbers/FixedNumberUtils');
   const TokenNames = require('../../constants/TokenNames');
   const TokenDecimals = require('../../constants/TokenDecimals');
-  const {BigNumber, FixedNumber} = require('ethers');
+  const {BigNumber} = require('ethers');
 
   const ACTION = `ARBITRAGE`;
 
@@ -35,11 +37,12 @@ module.exports = async (config, sharedObj, wallet) => {
 
     const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
+    const tokenADecimalMult = BigNumber.from(10).pow(TokenDecimals[tokenA]);
+    const tokenBDecimalMult = BigNumber.from(10).pow(TokenDecimals[tokenB]);
+
     // Adjust maxSrcNumber from config to the respective decimal places.
-    const tokenADecimalsMult = BigNumber.from(10).pow(TokenDecimals[tokenA]);
-    const tokenBDecimalsMult = BigNumber.from(10).pow(TokenDecimals[tokenB]);
-    let maxSrcAmountBigNumberA = BigNumber.from(maxSrcNumber).mul(tokenADecimalsMult);
-    let maxSrcAmountBigNumberB = BigNumber.from(maxSrcNumber).mul(tokenBDecimalsMult);
+    let maxSrcAmountBigNumberA = BigNumber.from(maxSrcNumber).mul(tokenADecimalMult);
+    let maxSrcAmountBigNumberB = BigNumber.from(maxSrcNumber).mul(tokenBDecimalMult);
 
     if (sharedObj.doesNeedToFetchTokenBalances) {
       localIsFetchingTokenBalances = true;
@@ -64,8 +67,8 @@ module.exports = async (config, sharedObj, wallet) => {
 
         const tokenABalanceFixed = FixedNumberUtils.From(sharedObj.tokenABalanceBigNumber);
         const tokenBBalanceFixed = FixedNumberUtils.From(sharedObj.tokenBBalanceBigNumber);
-        const adjustedTokenAFixed = FixedNumberUtils.Divide(tokenABalanceFixed, BigNumber.from(10).pow(TokenDecimals[tokenA]));
-        const adjustedTokenBFixed = FixedNumberUtils.Divide(tokenBBalanceFixed, BigNumber.from(10).pow(TokenDecimals[tokenB]));
+        const adjustedTokenAFixed = FixedNumberUtils.Divide(tokenABalanceFixed, tokenADecimalMult);
+        const adjustedTokenBFixed = FixedNumberUtils.Divide(tokenBBalanceFixed, tokenBDecimalMult);
         const totalBalanceUsd = adjustedTokenAFixed.addUnsafe(adjustedTokenBFixed);
 
         // noinspection ES6MissingAwait
@@ -113,6 +116,8 @@ module.exports = async (config, sharedObj, wallet) => {
     let srcAmountBigNumberB = sharedObj.tokenBBalanceBigNumber;
 
     if (priceNativeFloat > sellThreshold) {
+      decision = 'SELL';
+
       srcToken = tokenA;
       dstToken = tokenB;
 
@@ -124,8 +129,9 @@ module.exports = async (config, sharedObj, wallet) => {
 
       srcAmountBigNumber = srcAmountBigNumberA;
       dstPriceFixedNumber = FixedNumberUtils.From(sellThreshold);
-      decision = 'SELL';
     } else if (priceNativeFloat < buyThreshold) {
+      decision = 'BUY';
+
       srcToken = tokenB;
       dstToken = tokenA;
 
@@ -138,7 +144,6 @@ module.exports = async (config, sharedObj, wallet) => {
       srcAmountBigNumber = srcAmountBigNumberB;
       dstPriceFixedNumber = FixedNumberUtils.From(buyThreshold);
       dstPriceFixedNumber = FixedNumberUtils.Divide(1, dstPriceFixedNumber);
-      decision = 'BUY';
     }
 
     if (srcToken && !srcAmountBigNumber.isZero() && !sharedObj.isSwapping) {

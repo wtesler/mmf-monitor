@@ -7,6 +7,7 @@
   const readDefiMnemonic = require('../../../../secrets/specific/readDefiMnemonic');
   const {ethers, utils, BigNumber} = require("ethers");
   const readNativePrice = require('../../../token/readNativePrice');
+  const readCurrentNonce = require('../../../transact/readCurrentNonce');
   const FixedNumberUtils = require('../../../../numbers/FixedNumberUtils');
 
   const mnemonic = await readDefiMnemonic(3);
@@ -30,12 +31,15 @@
   // const srcBigNumber = BigNumber.from('36705028177096034348');
   const srcBigNumber = await readTokenBalance(SRC_TOKEN, wallet);
 
+  const nonce = await readCurrentNonce(wallet);
+
   await swapFast(
     SRC_TOKEN,
     DST_TOKEN,
     srcBigNumber,
     priceNativeFixedNumber,
-    0.996,
+    0.998,
+    nonce,
     wallet
   );
 

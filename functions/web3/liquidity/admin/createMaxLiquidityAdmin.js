@@ -4,9 +4,9 @@
   const TokenNames = require("../../../constants/TokenNames");
   const readDefiMnemonic = require('../../../secrets/specific/readDefiMnemonic');
 
-  const mnemonic = await readDefiMnemonic();
+  const mnemonic = await readDefiMnemonic(1);
 
   const wallet = await prepareWallet(mnemonic);
 
-  await createMaxLiquidity(TokenNames.MMF_MUSD, wallet);
+  await createMaxLiquidity(TokenNames.MUSD_USDC, wallet);
 })();

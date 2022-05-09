@@ -1,6 +1,7 @@
 module.exports = async (pairTokenName, wallet) => {
-  const {ethers} = require("ethers");
+  const {ethers, BigNumber} = require("ethers");
   const TokenAddresses = require("../../constants/TokenAddresses");
+  const TokenDecimals = require("../../constants/TokenDecimals");
   const TokenNames = require("../../constants/TokenNames");
   const readTokenBalance = require("../token/readTokenBalance");
   const readNativePrice = require("../token/readNativePrice");
@@ -29,7 +30,15 @@ module.exports = async (pairTokenName, wallet) => {
       throw new Error('Possibly did not pull balances properly. Trying again.');
     }
 
-    const adjustedABalance = FixedNumberUtils.Multiply(tokenABalance, priceNative);
+    let adjustedABalance = FixedNumberUtils.Multiply(tokenABalance, priceNative);
+
+    const decimalDiff = TokenDecimals[tokenA] - TokenDecimals[tokenB];
+    const tokenDecimalDiff = BigNumber.from(10).pow(Math.abs(decimalDiff));
+    if (decimalDiff > 0) {
+      adjustedABalance = FixedNumberUtils.Divide(adjustedABalance, tokenDecimalDiff);
+    } else {
+      adjustedABalance = FixedNumberUtils.Multiply(adjustedABalance, tokenDecimalDiff);
+    }
 
     const tokenPercentage = FixedNumberUtils.Divide(adjustedABalance, tokenBBalance);
 
