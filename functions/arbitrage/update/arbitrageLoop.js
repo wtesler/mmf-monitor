@@ -20,6 +20,9 @@ module.exports = async () => {
     config.nonce = await readCurrentNonce(config.wallet);
     config.isSwapping = false;
     config.needsBalanceUpdate = true;
+    if (!err) {
+      config.needsToReportSuccess = true;
+    }
   };
 
   const onUpdate = async ([priceFloat, [balanceA, balanceB]], config) => {
@@ -27,14 +30,26 @@ module.exports = async () => {
       return;
     }
 
-    const {balanceUpdater, wallet, nonce} = config;
+    const {balanceUpdater, wallet, nonce, email} = config;
 
     if (config.needsBalanceUpdate) {
       config.isUpdatingBalance = true;
-      await balanceUpdater.update((didUpdate) => {
+      await balanceUpdater.update((updateObj) => {
         config.isUpdatingBalance = false;
-        if (didUpdate) {
+        if (updateObj) {
+          const [tokenA, tokenB, balanceA, balanceB, totalBalanceUsd] = updateObj;
           config.needsBalanceUpdate = false;
+          if (config.needsToReportSuccess) {
+            // noinspection ES6MissingAwait
+            sendInBlueClient.sendEmail(email, 11, {
+              tokenA: tokenA,
+              tokenB: tokenB,
+              tokenABalance: balanceA.toString(),
+              tokenBBalance: balanceB.toString(),
+              totalBalanceUsd: totalBalanceUsd
+            });
+            config.needsToReportSuccess = false;
+          }
         }
       });
       return;
@@ -95,7 +110,7 @@ module.exports = async () => {
 
   // Refresh config every 10 minutes in case it changed on the backend.
   subscription.add(
-    interval(300000).subscribe(() => {
+    interval(600000).subscribe(() => {
       readConfigs();
     })
   );

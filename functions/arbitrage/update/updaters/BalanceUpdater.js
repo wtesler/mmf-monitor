@@ -43,7 +43,10 @@ module.exports = class BalanceUpdater {
   }
 
   async update(onResult) {
+    const TokenDecimals = require('../../../constants/TokenDecimals');
     const readTokenBalance = require('../../../web3/token/readTokenBalance');
+    const FixedNumberUtils = require('../../../numbers/FixedNumberUtils');
+    const {BigNumber} = require('ethers');
 
     try {
       const balances = await Promise.all([
@@ -54,7 +57,15 @@ module.exports = class BalanceUpdater {
       this.balanceA = balances[0];
       this.balanceB = balances[1];
 
-      onResult(true);
+      const tokenABalanceFixed = FixedNumberUtils.From(this.balanceA);
+      const tokenBBalanceFixed = FixedNumberUtils.From(this.balanceB);
+      const tokenADecimalMult = BigNumber.from('10').pow(TokenDecimals[this.tokenA]);
+      const tokenBDecimalMult = BigNumber.from('10').pow(TokenDecimals[this.tokenB]);
+      const adjustedTokenAFixed = FixedNumberUtils.Divide(tokenABalanceFixed, tokenADecimalMult);
+      const adjustedTokenBFixed = FixedNumberUtils.Divide(tokenBBalanceFixed, tokenBDecimalMult);
+      const totalBalanceUsd = adjustedTokenAFixed.addUnsafe(adjustedTokenBFixed).toString();
+
+      onResult([this.tokenA, this.tokenB, this.balanceA, this.balanceB, totalBalanceUsd]);
 
       this._emit();
     } catch (e) {

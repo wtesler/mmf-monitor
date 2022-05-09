@@ -73,7 +73,7 @@ module.exports = class PriceUpdater {
       const errStr = e.toString();
       if (errStr.includes('Bad Gateway')) {
         console.warn('Bad Gateway.');
-      } else if (errStr.message.includes('timeout')) {
+      } else if (e.message.includes('timeout')) {
         console.warn('Timeout.');
       } else {
         console.error(e);
