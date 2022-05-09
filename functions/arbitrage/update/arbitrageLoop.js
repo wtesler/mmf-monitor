@@ -75,6 +75,8 @@ module.exports = async () => {
       config.priceUpdater.setConfig(pairToken, config.wallet, updatePeriodMs);
       config.balanceUpdater.setConfig(pairToken, config.wallet);
 
+      config.needsBalanceUpdate = true;
+
       subscription.add(
         combineLatest(
           config.priceUpdater.observe(),
