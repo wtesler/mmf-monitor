@@ -26,6 +26,13 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
     return utils.hexZeroPad(hexString, 32).replace('0x', '');
   };
 
+  // console.log(srcBigNumber.toString());
+  // console.log(dstMinBigNumber.toString());
+  // console.log(wallet.address);
+  // console.log(deadline);
+  // console.log(TokenAddresses[srcToken]);
+  // console.log(TokenAddresses[dstToken]);
+
   const dataArr = [
     '0x38ed1739', // Method ID of swapExactTokensForTokens
     toPaddedString(srcBigNumber.toHexString()), // src amount

@@ -14,6 +14,8 @@ module.exports = class BalanceUpdater {
   setConfig(pairToken, wallet) {
     const TokenNames = require('../../../constants/TokenNames');
 
+    this.pairToken = pairToken;
+
     const [tokenA, tokenB] = TokenNames.SplitTokenNames(pairToken);
 
     let hasChanged = false;
@@ -68,8 +70,8 @@ module.exports = class BalanceUpdater {
 
   _emit() {
     if (this.balanceA && this.balanceB) {
-      console.log(`${this.tokenA} BALANCE: ${this.balanceA.toString()}`);
-      console.log(`${this.tokenB} BALANCE: ${this.balanceB.toString()}`);
+      console.log(`${this.pairToken} | ${this.tokenA} BALANCE: ${this.balanceA.toString()}`);
+      console.log(`${this.pairToken} | ${this.tokenB} BALANCE: ${this.balanceB.toString()}`);
     }
     this.balancesSubject.next([this.balanceA, this.balanceB]);
   }

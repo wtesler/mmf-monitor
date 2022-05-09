@@ -18,7 +18,7 @@ module.exports = (token1, token2, priceFloat, srcAmount, maxSrcNumber, threshold
   const adjustedMaxSrcAmountFixed = FixedNumberUtils.Multiply(maxSrcAmountFixed, thresholdPriceDiffMult);
   maxSrcAmount = FixedNumberUtils.NumberToBigNumber(adjustedMaxSrcAmountFixed);
 
-  const newSlippage = baseSlippage - (thresholdPriceDiff * thresholdPriceDiffMult);
+  const newSlippage = baseSlippage - thresholdPriceDiff;
 
   if (srcAmount.gt(maxSrcAmount)) {
     srcAmount = maxSrcAmount;

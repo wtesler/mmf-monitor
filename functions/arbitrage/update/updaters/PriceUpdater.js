@@ -56,7 +56,13 @@ module.exports = class PriceUpdater {
 
     try {
       this.numRequests++;
-      const priceNativeFixedNumber = await readNativePrice(this.pairToken, this.wallet.provider);
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 40000, 'timeout')); // 4 seconds.
+      const readPricePromise = readNativePrice(this.pairToken, this.wallet.provider);
+      const priceNativeFixedNumber = await Promise.race([readPricePromise, timeoutPromise]);
+      if (priceNativeFixedNumber === 'timeout') {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error('timeout');
+      }
       const priceNativeFloat = priceNativeFixedNumber.toUnsafeFloat();
       if (priceNativeFloat !== this.price) {
         console.log(`${this.pairToken} PRICE: ${priceNativeFloat.toFixed(6)}`);
@@ -67,6 +73,8 @@ module.exports = class PriceUpdater {
       const errStr = e.toString();
       if (errStr.includes('Bad Gateway')) {
         console.warn('Bad Gateway.');
+      } else if (errStr.message.includes('timeout')) {
+        console.warn('Timeout.');
       } else {
         console.error(e);
       }
