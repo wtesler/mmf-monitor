@@ -10,4 +10,8 @@ module.exports = class TokenAddresses {
   static get STABLE_SWAP() {
     return '0xdb04e53ec3fab887be2f55c3fd79bc57855bc827';
   }
+
+  static get ROUTER_PANCAKE_BSC() {
+    return '0x10ed43c718714eb63d5aa57b78b54704e256024e';
+  }
 };

@@ -2,7 +2,7 @@
   const createArbitrageConfig = require("../createArbitrageConfig");
   await createArbitrageConfig(
     {
-      baseSlippage: 0.99,
+      baseSlippage: 0.997,
       sellThreshold: 1.0029,
       maxSrcNumber: 1000,
       email: 'willtesler@gmail.com',

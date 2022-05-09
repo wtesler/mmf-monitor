@@ -3,28 +3,29 @@
  *
  * @param transactionAction An function which returns a pending transaction.
  * @param attempts Number of attempts before throwing error.
+ * @param timeout How long before we assumed the tx hanged.
  */
-module.exports = async (transactionAction, attempts=6) => {
+module.exports = async (transactionAction, attempts=6, timeout=120000) => {
   let numAttempts = 0;
   let error;
 
   while (numAttempts < attempts) {
     try {
-      // const timeoutPromise = new Promise(resolve => setTimeout(resolve, 120000, 'timeout')); // 2 minutes.
 
-      // const tx = await Promise.race([transactionAction(), timeoutPromise]);
       const tx = await transactionAction();
-
-      // if (tx === 'timeout') {
-      //   // noinspection ExceptionCaughtLocallyJS
-      //   throw new Error('TIMEOUT WAITING FOR TRANSACTION');
-      // }
 
       if (tx === null) {
         return false; // Transaction Action was a NOOP.
       }
 
-      const awaitedTx = await tx.wait();
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, timeout, 'timeout'));
+
+      const awaitedTx = await Promise.race([tx.wait(), timeoutPromise]);
+
+      if (awaitedTx === 'timeout') {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error('TIMEOUT WAITING FOR TRANSACTION');
+      }
 
       // console.log(awaitedTx);
 

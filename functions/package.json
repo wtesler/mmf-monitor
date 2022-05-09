@@ -22,7 +22,6 @@
     "firebase-functions": "3.20.1",
     "google-cloud-secrets": "1.3.2",
     "google-cloud-report-error": "1.0.0",
-    "macd": "1.0.4",
     "rxjs": "7.5.5",
     "superagent": "7.1.2"
   },

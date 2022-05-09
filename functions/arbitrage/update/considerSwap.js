@@ -38,11 +38,11 @@ module.exports = (priceFloat, balanceA, balanceB, wallet, config, onSwapResult, 
     console.log(`${ACTION} | ${decision}`);
 
     // noinspection ES6MissingAwait
-    sendInBlueClient.sendEmail(email, 10, {
-      pairToken: pairToken,
-      decision: decision,
-      price: priceStr
-    });
+    // sendInBlueClient.sendEmail(email, 10, {
+    //   pairToken: pairToken,
+    //   decision: decision,
+    //   price: priceStr
+    // });
 
     // noinspection JSIgnoredPromiseFromCall
     performArbitrageSwap(srcToken, dstToken, srcAmount, dstPriceFixed, slippage, wallet, nonce, onSwapResult);

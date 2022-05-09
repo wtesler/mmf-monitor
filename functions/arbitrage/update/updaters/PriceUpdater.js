@@ -45,7 +45,7 @@ module.exports = class PriceUpdater {
       // }
       // noinspection ES6MissingAwait
       await this._readPrice();
-      await new Promise(resolve => setTimeout(resolve, 500)); // Sleep
+      // await new Promise(resolve => setTimeout(resolve, 500)); // Sleep
     }
   }
 

@@ -62,10 +62,12 @@ module.exports = async (srcToken, dstToken, srcBigNumber, nativePriceFixed, slip
 
   console.log(`${ACTION} | Swapping ${srcBigNumber.toString()} ${srcToken} for atleast ${dstMinBigNumber.toString()} ${dstToken}.`);
 
-  await resilientTransact(async () => {
+  const completedTx = await resilientTransact(async () => {
     const signedTx = await wallet.signTransaction(tx);
     return wallet.provider.sendTransaction(signedTx);
-  }, 1);
+  }, 1, 60000);
 
   console.log(`${ACTION} | SUCCESS`);
+
+  return completedTx;
 };

@@ -26,6 +26,7 @@ module.exports = (token1, token2, priceFloat, srcAmount, maxSrcNumber, threshold
   }
 
   let dstPriceFixed = FixedNumberUtils.From(threshold);
+
   if (invertDstAmount) {
     dstPriceFixed = FixedNumberUtils.Divide(1, dstPriceFixed);
   }
