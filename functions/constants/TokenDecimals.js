@@ -43,7 +43,7 @@ module.exports = class TokenDecimals {
     return 18;
   }
 
-  static get USDC_USDT() {
+  static get USDT_USDC() {
     return 18;
   }
 

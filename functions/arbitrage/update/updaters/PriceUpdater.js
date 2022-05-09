@@ -4,19 +4,17 @@ module.exports = class PriceUpdater {
 
     this.price = null;
     this.shouldUpdate = false;
-    this.updatePeriodMs = 1000;
     this.numRequests = 0;
 
     this.priceSubject = new BehaviorSubject(null);
   }
 
-  setConfig(pairToken, wallet, updatePeriodMs) {
+  setConfig(pairToken, wallet) {
     if (this.pairToken !== pairToken) {
       this._clear();
     }
     this.pairToken = pairToken;
     this.wallet = wallet;
-    this.updatePeriodMs = updatePeriodMs;
   }
 
   start() {
@@ -47,17 +45,17 @@ module.exports = class PriceUpdater {
       // }
       // noinspection ES6MissingAwait
       await this._readPrice();
-      // await new Promise(resolve => setTimeout(resolve, this.updatePeriodMs)); // Sleep
+      await new Promise(resolve => setTimeout(resolve, 500)); // Sleep
     }
   }
 
   async _readPrice() {
-    const readNativePrice = require('../../../web3/token/readNativePrice');
+    const readNativePriceFast = require('../../../web3/token/readNativePriceFast');
 
     try {
       this.numRequests++;
       const timeoutPromise = new Promise(resolve => setTimeout(resolve, 40000, 'timeout')); // 4 seconds.
-      const readPricePromise = readNativePrice(this.pairToken, this.wallet.provider);
+      const readPricePromise = readNativePriceFast(this.pairToken, this.wallet.provider);
       const priceNativeFixedNumber = await Promise.race([readPricePromise, timeoutPromise]);
       if (priceNativeFixedNumber === 'timeout') {
         // noinspection ExceptionCaughtLocallyJS

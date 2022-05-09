@@ -80,14 +80,16 @@ module.exports = async () => {
 
     configs = await readArbitrageConfigs();
 
+    const sleepOffsetMs = 1000 + (1000 / configs.length);
+
     for (const config of configs) {
-      const {pairToken, mnemonic, updatePeriodMs} = config;
+      const {pairToken, mnemonic} = config;
       config.wallet = await prepareWallet(mnemonic);
       config.nonce = await readCurrentNonce(config.wallet);
       config.priceUpdater = new PriceUpdater();
       config.balanceUpdater = new BalanceUpdater();
 
-      config.priceUpdater.setConfig(pairToken, config.wallet, updatePeriodMs);
+      config.priceUpdater.setConfig(pairToken, config.wallet);
       config.balanceUpdater.setConfig(pairToken, config.wallet);
 
       config.needsBalanceUpdate = true;
@@ -103,6 +105,8 @@ module.exports = async () => {
       );
 
       config.priceUpdater.start();
+
+      await new Promise(resolve => setTimeout(resolve, sleepOffsetMs)); // Sleep
     }
   };
 

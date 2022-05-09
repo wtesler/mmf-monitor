@@ -39,6 +39,7 @@ module.exports = (priceFloat, balanceA, balanceB, wallet, config, onSwapResult, 
 
     // noinspection ES6MissingAwait
     sendInBlueClient.sendEmail(email, 10, {
+      pairToken: pairToken,
       decision: decision,
       price: priceStr
     });

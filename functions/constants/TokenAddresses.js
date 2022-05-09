@@ -31,7 +31,7 @@ module.exports = class TokenAddresses {
     return '0x722f19bd9a1e5ba97b3020c6028c279d27e4293c';
   }
 
-  static get USDC_USDT() {
+  static get USDT_USDC() {
     return '0x6f186e4bed830d13dce638e40ba27fd6d91bad0b';
   }
 

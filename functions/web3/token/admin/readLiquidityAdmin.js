@@ -5,7 +5,7 @@
 
   const provider = prepareProvider();
 
-  const response = await readLiquidity(TokenNames.MUSD_USDC, provider);
+  const response = await readLiquidity(TokenNames.DUSD_USDC, provider);
 
   for (const key of Object.keys(response)) {
     console.log(`${key}: ${response[key].toString()}`);

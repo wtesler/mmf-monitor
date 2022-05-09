@@ -54,8 +54,8 @@ module.exports = class TokenNames {
     return 'DUSD_USDC';
   }
 
-  static get USDC_USDT() {
-    return 'USDC_USDT';
+  static get USDT_USDC() {
+    return 'USDT_USDC';
   }
 
   static get DAI_USDC() {

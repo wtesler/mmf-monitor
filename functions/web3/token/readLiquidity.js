@@ -1,4 +1,4 @@
-module.exports = async (pairTokenName, provider) => {
+module.exports = async (pairTokenName, provider, alignAddresses = true) => {
   const {ethers} = require("ethers");
   const pairAbi = require("../contracts/abis/meerkat_pair_abi.json");
   const TokenAddresses = require("../../constants/TokenAddresses");
@@ -14,9 +14,9 @@ module.exports = async (pairTokenName, provider) => {
   let quoteAddress;
   let reserves;
 
-  const readInfo = async() => {
+  const readInfo = async () => {
     [quoteAddress, reserves] = await Promise.all([
-      contract.token0(),
+      alignAddresses ? contract.token0() : Promise.resolve('unused'),
       contract.getReserves()
     ]);
   };
@@ -29,11 +29,15 @@ module.exports = async (pairTokenName, provider) => {
     await readInfo();
   }
 
+  // console.log(reserves[0].toString());
+  // console.log(reserves[1].toString());
 
   const quoteReserve = reserves[0];
   const baseReserve = reserves[1];
 
-  const isTokenAQuote = TokenAddresses.AreAddressesEqual(quoteAddress, TokenAddresses[tokenA]);
+  const isTokenAQuote = alignAddresses ?
+    TokenAddresses.AreAddressesEqual(quoteAddress, TokenAddresses[tokenA])
+    : true;
 
   response[tokenA] = isTokenAQuote ? quoteReserve : baseReserve;
   response[tokenB] = isTokenAQuote ? baseReserve : quoteReserve;

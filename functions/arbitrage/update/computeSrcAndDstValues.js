@@ -11,14 +11,15 @@ module.exports = (token1, token2, priceFloat, srcAmount, maxSrcNumber, threshold
   let maxSrcAmount = BigNumber.from(maxSrcNumber).mul(tokenDecimalMult);
 
   // Adjust maxSrcAmount based on how far we crossed over the threshold.
-  const maxSrcAmountFixed = FixedNumberUtils.From(maxSrcAmount);
-  const thresholdPriceDiff = Math.abs(priceFloat - threshold);
-  const thresholdPriceDiffMult = Math.max(thresholdPriceDiff * crossoverMult, 1);
-
-  const adjustedMaxSrcAmountFixed = FixedNumberUtils.Multiply(maxSrcAmountFixed, thresholdPriceDiffMult);
-  maxSrcAmount = FixedNumberUtils.NumberToBigNumber(adjustedMaxSrcAmountFixed);
-
-  const newSlippage = baseSlippage - thresholdPriceDiff;
+  // const maxSrcAmountFixed = FixedNumberUtils.From(maxSrcAmount);
+  // const thresholdPriceDiff = Math.abs(priceFloat - threshold);
+  // const thresholdPriceDiffMult = Math.max(thresholdPriceDiff * crossoverMult, 1);
+  //
+  // const adjustedMaxSrcAmountFixed = FixedNumberUtils.Multiply(maxSrcAmountFixed, thresholdPriceDiffMult);
+  // maxSrcAmount = FixedNumberUtils.NumberToBigNumber(adjustedMaxSrcAmountFixed);
+  //
+  // const newSlippage = baseSlippage - thresholdPriceDiff;
+  const newSlippage = baseSlippage;
 
   if (srcAmount.gt(maxSrcAmount)) {
     srcAmount = maxSrcAmount;
