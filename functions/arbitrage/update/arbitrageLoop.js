@@ -37,16 +37,15 @@ module.exports = async () => {
       await balanceUpdater.update((updateObj) => {
         config.isUpdatingBalance = false;
         if (updateObj) {
-          const [tokenA, tokenB, balanceA, balanceB, totalBalanceUsd] = updateObj;
+          const [tokenA, tokenB, balanceAUsd, balanceBUsd] = updateObj;
           config.needsBalanceUpdate = false;
           if (config.needsToReportSuccess) {
             // noinspection ES6MissingAwait
             sendInBlueClient.sendEmail(email, 11, {
               tokenA: tokenA,
               tokenB: tokenB,
-              tokenABalance: balanceA.toString(),
-              tokenBBalance: balanceB.toString(),
-              totalBalanceUsd: totalBalanceUsd
+              tokenABalanceUsd: balanceAUsd,
+              tokenBBalanceUsd: balanceBUsd,
             });
             config.needsToReportSuccess = false;
           }

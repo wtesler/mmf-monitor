@@ -63,9 +63,11 @@ module.exports = class BalanceUpdater {
       const tokenBDecimalMult = BigNumber.from('10').pow(TokenDecimals[this.tokenB]);
       const adjustedTokenAFixed = FixedNumberUtils.Divide(tokenABalanceFixed, tokenADecimalMult);
       const adjustedTokenBFixed = FixedNumberUtils.Divide(tokenBBalanceFixed, tokenBDecimalMult);
-      const totalBalanceUsd = adjustedTokenAFixed.addUnsafe(adjustedTokenBFixed).toString();
+      const adjustedTokenAFloatStr = adjustedTokenAFixed.toUnsafeFloat().toFixed(2);
+      const adjustedTokenBFloatStr = adjustedTokenBFixed.toUnsafeFloat().toFixed(2);
+      // const totalBalanceUsd = adjustedTokenAFixed.addUnsafe(adjustedTokenBFixed).toString();
 
-      onResult([this.tokenA, this.tokenB, this.balanceA, this.balanceB, totalBalanceUsd]);
+      onResult([this.tokenA, this.tokenB, adjustedTokenAFloatStr, adjustedTokenBFloatStr]);
 
       this._emit();
     } catch (e) {
